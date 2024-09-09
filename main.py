@@ -5,9 +5,9 @@ from niveles import nivel_1, nivel_2, nivel_3  # Importamos los niveles
 # Inicializar Pygame
 pygame.init()
 
-# Configuración de pantalla
+# Configuración de pantalla para Raspberry Pi (800x480)
 SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_HEIGHT = 480
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Juego de Matemáticas - Mapa de Niveles')
 
@@ -15,15 +15,15 @@ pygame.display.set_caption('Juego de Matemáticas - Mapa de Niveles')
 mapa_fondo = pygame.image.load(r'imagenes/mapa_juego.jpg')
 mapa_fondo = pygame.transform.scale(mapa_fondo, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-# Definir posiciones de los niveles en el mapa
+# Definir posiciones de los niveles en el mapa (x, y, radio del círculo ajustado)
 niveles = {
-    'Nivel 1': (200, 300, 50),
-    'Nivel 2': (400, 200, 50),
-    'Nivel 3': (600, 400, 50)
+    'Nivel 1': (150, 200, 40),  # Coordenadas (x, y) y radio del círculo más pequeño
+    'Nivel 2': (400, 150, 40),
+    'Nivel 3': (650, 300, 40)
 }
 
 # Cargar fuentes
-font = pygame.font.Font(None, 74)
+font = pygame.font.Font(None, 60)  # Fuente más pequeña para adaptarse a la pantalla
 
 # Función para mostrar el número dentro de un círculo
 def mostrar_numero(numero, fuente, color, x, y):
@@ -39,7 +39,7 @@ def mapa_niveles():
 
         # Dibujar los círculos de los niveles y los números en ellos
         for i, (nivel, (x, y, radio)) in enumerate(niveles.items(), start=1):
-            pygame.draw.circle(screen, (255, 0, 0), (x, y), radio)  # Círculos rojos
+            pygame.draw.circle(screen, (255, 0, 0), (x, y), radio)  # Círculos rojos más pequeños
             mostrar_numero(str(i), font, (255, 255, 255), x, y)  # Números en blanco dentro de los círculos
 
         # Manejar eventos de selección de nivel
