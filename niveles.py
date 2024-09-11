@@ -19,10 +19,15 @@ GREEN = (0, 255, 0)
 # Cargar fuentes
 font = pygame.font.Font(r'fuentes/GamestationCond.otf', 50)
 small_font = pygame.font.Font(r'fuentes/GamestationCond.otf', 24)
+small_fontTabla = pygame.font.Font(r'fuentes/GamestationCond.otf', 50)
 
 # Cargar imagen de fondo
 fondo_menu = pygame.image.load(r'imagenes/Fondo_menu.png')
 fondo_menu = pygame.transform.scale(fondo_menu, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+# Cargar imagen de fondo para las preguntas
+fondo_pregunta = pygame.image.load(r'imagenes/fondo_preguntas.png')
+fondo_pregunta = pygame.transform.scale(fondo_pregunta, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Generar una pregunta de multiplicación aleatoria basada en la tabla seleccionada
 def generar_pregunta(tabla_seleccionada):
@@ -85,21 +90,24 @@ def menu_tabla_multiplicar(screen, volver_al_mapa):
 # Función de nivel con tabla seleccionada
 def nivel(screen, volver_al_mapa, tabla_seleccionada):
     preguntas_restantes = 12
+    aciertos = 0  # Contador de aciertos
+    puntos = 0    # Contador de puntos (2 puntos por acierto)
 
     while preguntas_restantes > 0:
-        screen.fill(WHITE)
+        # Mostrar el fondo de las preguntas
+        screen.blit(fondo_pregunta, (0, 0))
 
         # Generar una pregunta aleatoria
         num1, num2, resultado_correcto, respuestas = generar_pregunta(tabla_seleccionada)
 
-        # Mostrar la pregunta
-        mostrar_texto_centrado(f'{num1} x {num2} = ?', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 4, 200, 50), screen)
+        # Mostrar la pregunta (centrada dentro del marco superior)
+        mostrar_texto_centrado(f'{num1} x {num2} = ?', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 6 - 30, 300, 100), screen)
 
-        # Mostrar las respuestas en dos columnas
-        mostrar_texto_centrado(str(respuestas[0]), small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2, 100, 50), screen)
-        mostrar_texto_centrado(str(respuestas[1]), small_font, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2, 100, 50), screen)
-        mostrar_texto_centrado(str(respuestas[2]), small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 + 50, 100, 50), screen)
-        mostrar_texto_centrado(str(respuestas[3]), small_font, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 + 50, 100, 50), screen)
+        # Mostrar las respuestas dentro de los botones rojos
+        mostrar_texto_centrado(str(respuestas[0]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 - 60, 100, 50), screen)
+        mostrar_texto_centrado(str(respuestas[1]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 - 60, 100, 50), screen)
+        mostrar_texto_centrado(str(respuestas[2]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50), screen)
+        mostrar_texto_centrado(str(respuestas[3]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50), screen)
 
         # Dibujar los botones "Siguiente" y "Salir"
         dibujar_botones(screen)
@@ -117,13 +125,13 @@ def nivel(screen, volver_al_mapa, tabla_seleccionada):
                     mouse_pos = pygame.mouse.get_pos()
 
                     # Detectar la respuesta seleccionada según la posición del clic
-                    if SCREEN_WIDTH // 3 - 50 <= mouse_pos[0] <= SCREEN_WIDTH // 3 + 50 and SCREEN_HEIGHT // 2 - 25 <= mouse_pos[1] <= SCREEN_HEIGHT // 2 + 25:
+                    if SCREEN_WIDTH // 3 - 50 <= mouse_pos[0] <= SCREEN_WIDTH // 3 + 50 and SCREEN_HEIGHT // 2 - 60 <= mouse_pos[1] <= SCREEN_HEIGHT // 2 - 10:
                         respuesta_seleccionada = respuestas[0]
-                    elif SCREEN_WIDTH * 2 // 3 - 50 <= mouse_pos[0] <= SCREEN_WIDTH * 2 // 3 + 50 and SCREEN_HEIGHT // 2 - 25 <= mouse_pos[1] <= SCREEN_HEIGHT // 2 + 25:
+                    elif SCREEN_WIDTH * 2 // 3 - 50 <= mouse_pos[0] <= SCREEN_WIDTH * 2 // 3 + 50 and SCREEN_HEIGHT // 2 - 60 <= mouse_pos[1] <= SCREEN_HEIGHT // 2 - 10:
                         respuesta_seleccionada = respuestas[1]
-                    elif SCREEN_WIDTH // 3 - 50 <= mouse_pos[0] <= SCREEN_WIDTH // 3 + 50 and SCREEN_HEIGHT // 2 + 50 - 25 <= mouse_pos[1] <= SCREEN_HEIGHT // 2 + 50 + 25:
+                    elif SCREEN_WIDTH // 3 - 50 <= mouse_pos[0] <= SCREEN_WIDTH // 3 + 50 and SCREEN_HEIGHT // 2 + 40 - 50 <= mouse_pos[1] <= SCREEN_HEIGHT // 2 + 90:
                         respuesta_seleccionada = respuestas[2]
-                    elif SCREEN_WIDTH * 2 // 3 - 50 <= mouse_pos[0] <= SCREEN_WIDTH * 2 // 3 + 50 and SCREEN_HEIGHT // 2 + 50 - 25 <= mouse_pos[1] <= SCREEN_HEIGHT // 2 + 50 + 25:
+                    elif SCREEN_WIDTH * 2 // 3 - 50 <= mouse_pos[0] <= SCREEN_WIDTH * 2 // 3 + 50 and SCREEN_HEIGHT // 2 + 40 - 50 <= mouse_pos[1] <= SCREEN_HEIGHT // 2 + 90:
                         respuesta_seleccionada = respuestas[3]
 
                     # Comprobar si se hace clic en el botón "Siguiente"
@@ -137,13 +145,25 @@ def nivel(screen, volver_al_mapa, tabla_seleccionada):
             # Mostrar si la respuesta es correcta o incorrecta
             if respuesta_seleccionada is not None:
                 if respuesta_seleccionada == resultado_correcto:
-                    mostrar_texto_centrado('Correcto!', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 + 150, 200, 50), screen)
+                    aciertos += 1  # Sumar un acierto
+                    puntos += 2    # Sumar 2 puntos por acierto
+                    mostrar_texto_centrado('¡Correcto!', font, GREEN, pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 + 150, 200, 50), screen)
                 else:
-                    mostrar_texto_centrado(f'Incorrecto! {num1} x {num2} = {resultado_correcto}', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 150, 300, 50), screen)
+                    mostrar_texto_centrado(f'¡Incorrecto! {num1} x {num2} = {resultado_correcto}', font, RED, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 150, 300, 50), screen)
+                                # Comprobar si la respuesta es correcta o incorrecta
+            
 
             pygame.display.update()
 
         preguntas_restantes -= 1
+
+    # Mostrar el puntaje final
+    screen.fill(WHITE)
+    mostrar_texto_centrado(f'Has terminado el nivel!', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50, 300, 50), screen)
+    mostrar_texto_centrado(f'Aciertos: {aciertos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2, 300, 50), screen)
+    mostrar_texto_centrado(f'Puntos: {puntos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 50, 300, 50), screen)
+    pygame.display.update()
+    pygame.time.wait(5000)  # Esperar 3 segundos para mostrar el puntaje
 
     volver_al_mapa()
 
