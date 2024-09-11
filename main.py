@@ -1,6 +1,7 @@
 import pygame
 import sys
 from niveles import nivel_1, nivel_2, nivel_3  # Importamos los niveles
+from compartido import mostrar_texto_centrado  # Importamos la función compartida
 
 # Inicializar Pygame
 pygame.init()
@@ -52,11 +53,11 @@ def mapa_niveles():
                 for i, (nivel, (x, y, radio)) in enumerate(niveles.items(), start=1):
                     if (x - radio) <= mouse_pos[0] <= (x + radio) and (y - radio) <= mouse_pos[1] <= (y + radio):
                         if i == 1:
-                            nivel_1()  # Inicia Nivel 1
+                            nivel_1(screen, mapa_niveles)  # Inicia Nivel 1
                         elif i == 2:
-                            nivel_2()  # Inicia Nivel 2
+                            nivel_2(screen, mapa_niveles)  # Inicia Nivel 2
                         elif i == 3:
-                            nivel_3()  # Inicia Nivel 3
+                            nivel_3(screen, mapa_niveles)  # Inicia Nivel 3
 
         pygame.display.update()
 

@@ -1,6 +1,7 @@
 import pygame
 import sys
 import random
+from compartido import mostrar_texto_centrado  # Importamos la función compartida desde el archivo compartido.py
 
 # Inicializar Pygame
 pygame.init()
@@ -8,113 +9,105 @@ pygame.init()
 # Configuración de pantalla para Raspberry Pi (800x480)
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 480
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-# Colores
+# Definir colores
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-GREEN = (0, 255, 0)
 RED = (255, 0, 0)
+GREEN = (0, 255, 0)
 
 # Cargar fuentes
-font = pygame.font.Font(None, 60)
-small_font = pygame.font.Font(None, 36)
+font = pygame.font.Font(r'fuentes/GamestationCond.otf', 50)
+small_font = pygame.font.Font(r'fuentes/GamestationCond.otf', 24)
 
-# Variables de juego
-puntuacion = 0
-preguntas_restantes = 12  # 12 preguntas por tabla de multiplicar
-tabla_seleccionada = None  # Variable para guardar la tabla de multiplicar seleccionada
+# Cargar imagen de fondo
+fondo_menu = pygame.image.load(r'imagenes/Fondo_menu.png')
+fondo_menu = pygame.transform.scale(fondo_menu, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-# Función para mostrar texto
-def mostrar_texto(texto, fuente, color, x, y):
-    superficie = fuente.render(texto, True, color)
-    rect = superficie.get_rect()
-    rect.center = (x, y)
-    screen.blit(superficie, rect)
+# Generar una pregunta de multiplicación aleatoria basada en la tabla seleccionada
+def generar_pregunta(tabla_seleccionada):
+    num1 = tabla_seleccionada
+    num2 = random.randint(1, 12)
+    resultado_correcto = num1 * num2
+    respuestas = [resultado_correcto, random.randint(1, 144), random.randint(1, 144), random.randint(1, 144)]
+    random.shuffle(respuestas)
+    return num1, num2, resultado_correcto, respuestas
 
 # Menú para seleccionar la tabla de multiplicar (2 al 12)
-def menu_tabla_multiplicar():
-    global tabla_seleccionada
+def menu_tabla_multiplicar(screen, volver_al_mapa):
     while True:
-        screen.fill(WHITE)
-        mostrar_texto('Selecciona la tabla de multiplicar:', font, BLACK, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 6)
+        screen.blit(fondo_menu, (0, 0))
 
-        # Mostrar opciones de tablas (2 al 12)
-        for i in range(2, 13):
-            mostrar_texto(f'Tabla del {i}', small_font, BLACK, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + (i - 2) * 30)
+        # Definir posiciones exactas de los botones en la imagen
+        botones = {
+            'Tabla del 2': pygame.Rect(110, 180, 170, 60),
+            'Tabla del 3': pygame.Rect(110, 240, 170, 60),  # Subimos la fila de la Tabla del 3
+            'Tabla del 4': pygame.Rect(110, 300, 170, 60),  # Subimos la fila de la Tabla del 4
+            'Tabla del 5': pygame.Rect(110, 360, 170, 60),  # Subimos la fila de la Tabla del 5
+            'Tabla del 6': pygame.Rect(320, 180, 170, 60),
+            'Tabla del 7': pygame.Rect(320, 240, 170, 60),  # Subimos la fila de la Tabla del 7
+            'Tabla del 8': pygame.Rect(320, 300, 170, 60),  # Subimos la fila de la Tabla del 8
+            'Tabla del 9': pygame.Rect(320, 360, 170, 60),  # Subimos la fila de la Tabla del 9
+            'Tabla del 10': pygame.Rect(530, 180, 170, 60),
+            'Tabla del 11': pygame.Rect(530, 240, 170, 60),  # Subimos la fila de la Tabla del 11
+            'Tabla del 12': pygame.Rect(530, 300, 170, 60)   # Subimos la fila de la Tabla del 12
+        }
 
-        # Manejar eventos de selección de tabla
+        # Dibujar botón "ATRÁS" en la esquina superior izquierda
+        boton_atras = pygame.Rect(10, 10, 100, 40)
+        pygame.draw.rect(screen, BLACK, boton_atras)
+        mostrar_texto_centrado('ATRÁS', small_font, WHITE, boton_atras, screen)
+
+        # Mostrar el texto en los botones, alineado y centrado
+        for tabla, rect in botones.items():
+            mostrar_texto_centrado(tabla, small_font, WHITE, rect, screen)
+
+        # Manejar eventos
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-                for i in range(2, 13):
-                    if SCREEN_HEIGHT // 2 + (i - 2) * 30 - 15 <= mouse_pos[1] <= SCREEN_HEIGHT // 2 + (i - 2) * 30 + 15:
-                        tabla_seleccionada = i
-                        return  # Salimos del menú y pasamos al nivel
+
+                # Detectar si se presiona el botón "ATRÁS"
+                if boton_atras.collidepoint(mouse_pos):
+                    return volver_al_mapa()  # Regresar al mapa de niveles
+
+                # Detectar selección de tabla
+                for tabla, rect in botones.items():
+                    if rect.collidepoint(mouse_pos):
+                        tabla_seleccionada = int(tabla.split()[-1])  # Extraer el número de la tabla seleccionada
+                        return tabla_seleccionada  # Salimos del menú y pasamos a las preguntas
 
         pygame.display.update()
 
-# Generar una pregunta de multiplicación aleatoria basada en la tabla seleccionada
-def generar_pregunta():
-    global tabla_seleccionada
-    if tabla_seleccionada is None:
-        print("Error: No se ha seleccionado ninguna tabla.")
-        return None, None, None, None
-    
-    num1 = tabla_seleccionada
-    num2 = random.randint(1, 12)  # Multiplicamos del 1 al 12 de forma aleatoria
-    resultado_correcto = num1 * num2
-    respuestas = [resultado_correcto, random.randint(1, 144), random.randint(1, 144), random.randint(1, 144)]  # Respuestas aleatorias
-    random.shuffle(respuestas)
-    return num1, num2, resultado_correcto, respuestas
-
-# Función para dibujar los botones "Siguiente" y "Salir"
-def dibujar_botones():
-    # Dibujar botón "Siguiente"
-    pygame.draw.rect(screen, GREEN, (SCREEN_WIDTH - 180, SCREEN_HEIGHT - 80, 160, 50))
-    mostrar_texto('Siguiente', small_font, WHITE, SCREEN_WIDTH - 100, SCREEN_HEIGHT - 55)
-
-    # Dibujar botón "Salir"
-    pygame.draw.rect(screen, RED, (20, SCREEN_HEIGHT - 80, 160, 50))
-    mostrar_texto('Salir', small_font, WHITE, 100, SCREEN_HEIGHT - 55)
-
-# Nivel 1 - Tablas de multiplicar
-def nivel_1():
-    global puntuacion, preguntas_restantes
-    preguntas_restantes = 12  # 12 preguntas por tabla
-    puntuacion = 0  # Reiniciar puntuación
-
-    # Llamar al menú de selección de tabla antes de empezar
-    menu_tabla_multiplicar()
+# Función de nivel con tabla seleccionada
+def nivel(screen, volver_al_mapa, tabla_seleccionada):
+    preguntas_restantes = 12
 
     while preguntas_restantes > 0:
         screen.fill(WHITE)
 
         # Generar una pregunta aleatoria
-        num1, num2, resultado_correcto, respuestas = generar_pregunta()
-
-        if num1 is None:  # Si no se seleccionó ninguna tabla, terminamos
-            break
+        num1, num2, resultado_correcto, respuestas = generar_pregunta(tabla_seleccionada)
 
         # Mostrar la pregunta
-        mostrar_texto(f'{num1} x {num2} = ?', font, BLACK, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 4)
+        mostrar_texto_centrado(f'{num1} x {num2} = ?', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 4, 200, 50), screen)
 
         # Mostrar las respuestas en dos columnas
-        mostrar_texto(str(respuestas[0]), small_font, BLACK, SCREEN_WIDTH // 3, SCREEN_HEIGHT // 2)
-        mostrar_texto(str(respuestas[1]), small_font, BLACK, SCREEN_WIDTH * 2 // 3, SCREEN_HEIGHT // 2)
-        mostrar_texto(str(respuestas[2]), small_font, BLACK, SCREEN_WIDTH // 3, SCREEN_HEIGHT // 2 + 50)
-        mostrar_texto(str(respuestas[3]), small_font, BLACK, SCREEN_WIDTH * 2 // 3, SCREEN_HEIGHT // 2 + 50)
+        mostrar_texto_centrado(str(respuestas[0]), small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2, 100, 50), screen)
+        mostrar_texto_centrado(str(respuestas[1]), small_font, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2, 100, 50), screen)
+        mostrar_texto_centrado(str(respuestas[2]), small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 + 50, 100, 50), screen)
+        mostrar_texto_centrado(str(respuestas[3]), small_font, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 + 50, 100, 50), screen)
 
-        # Dibujar los botones de control
-        dibujar_botones()
+        # Dibujar los botones "Siguiente" y "Salir"
+        dibujar_botones(screen)
 
         # Manejar eventos de selección de respuesta y botones
         respuesta_seleccionada = None
         resultado_mostrado = False
-        while not resultado_mostrado:  # Este bucle permite quedarse en la pregunta hasta que se elija "Siguiente"
+        while not resultado_mostrado:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -144,26 +137,40 @@ def nivel_1():
             # Mostrar si la respuesta es correcta o incorrecta
             if respuesta_seleccionada is not None:
                 if respuesta_seleccionada == resultado_correcto:
-                    mostrar_texto('Correcto!', font, GREEN, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 150)
+                    mostrar_texto_centrado('Correcto!', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 + 150, 200, 50), screen)
                 else:
-                    mostrar_texto(f'Incorrecto! {num1} x {num2} = {resultado_correcto}', font, RED, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 150)
+                    mostrar_texto_centrado(f'Incorrecto! {num1} x {num2} = {resultado_correcto}', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 150, 300, 50), screen)
 
             pygame.display.update()
 
         preguntas_restantes -= 1
 
-    # Mostrar la puntuación final
-    screen.fill(WHITE)
-    mostrar_texto(f'Puntuación final: {puntuacion}', font, BLACK, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-    pygame.display.update()
-    pygame.time.wait(3000)
+    volver_al_mapa()
 
-    # Volver al mapa de niveles después de completar el nivel 1
-    mapa_niveles()
+# Dibujar botones "Siguiente" y "Salir"
+def dibujar_botones(screen):
+    # Dibujar botón "Siguiente"
+    pygame.draw.rect(screen, BLACK, (SCREEN_WIDTH - 180, SCREEN_HEIGHT - 80, 160, 50))
+    mostrar_texto_centrado('Siguiente', small_font, WHITE, pygame.Rect(SCREEN_WIDTH - 180, SCREEN_HEIGHT - 80, 160, 50), screen)
 
-# Placeholder para los siguientes niveles
-def nivel_2():
-    pass
+    # Dibujar botón "Salir"
+    pygame.draw.rect(screen, BLACK, (20, SCREEN_HEIGHT - 80, 160, 50))
+    mostrar_texto_centrado('Salir', small_font, WHITE, pygame.Rect(20, SCREEN_HEIGHT - 80, 160, 50), screen)
 
-def nivel_3():
-    pass
+# Nivel 1
+def nivel_1(screen, volver_al_mapa):
+    tabla_seleccionada = menu_tabla_multiplicar(screen, volver_al_mapa)
+    if tabla_seleccionada:
+        nivel(screen, volver_al_mapa, tabla_seleccionada)
+
+# Nivel 2
+def nivel_2(screen, volver_al_mapa):
+    tabla_seleccionada = menu_tabla_multiplicar(screen, volver_al_mapa)
+    if tabla_seleccionada:
+        nivel(screen, volver_al_mapa, tabla_seleccionada)
+
+# Nivel 3
+def nivel_3(screen, volver_al_mapa):
+    tabla_seleccionada = menu_tabla_multiplicar(screen, volver_al_mapa)
+    if tabla_seleccionada:
+        nivel(screen, volver_al_mapa, tabla_seleccionada)
