@@ -247,13 +247,187 @@ def game_over(screen, puntos, volver_al_mapa):
     pygame.time.wait(5000)
     volver_al_mapa()  # Redirigir al menú de selección de tablas
 
+
+import random
+import pygame
+from compartido import mostrar_texto_centrado  # Importamos la función compartida desde el archivo compartido.py
+
+# Generar una pregunta aleatoria para el segundo nivel con respuestas correctas
+def generar_pregunta_segundo_nivel():
+    tipo_pregunta = random.choice(["multiplicacion_dos_digitos", "combinacion_operaciones", "resultado_faltante"])
+    
+    if tipo_pregunta == "multiplicacion_dos_digitos":
+        # Multiplicación con dos dígitos
+        num1 = random.randint(10, 99)
+        num2 = random.randint(10, 99)
+        resultado_correcto = num1 * num2
+        
+        # Generar respuestas incorrectas distintas y únicas
+        respuestas_incorrectas = set()
+        while len(respuestas_incorrectas) < 3:
+            incorrecta = random.randint(100, 9999)
+            if incorrecta != resultado_correcto:
+                respuestas_incorrectas.add(incorrecta)
+        
+        # Añadir la respuesta correcta y mezclar
+        respuestas = [resultado_correcto] + list(respuestas_incorrectas)
+        random.shuffle(respuestas)
+        pregunta = f"{num1} x {num2} = ?"
+        return pregunta, resultado_correcto, respuestas
+
+    elif tipo_pregunta == "combinacion_operaciones":
+        # Combinación de operaciones: multiplicación + suma o resta
+        num1 = random.randint(1, 10)
+        num2 = random.randint(1, 10)
+        num3 = random.randint(1, 10)
+        operacion = random.choice(["+", "-"])
+        
+        if operacion == "+":
+            resultado_correcto = num1 * num2 + num3
+            pregunta = f"{num1} x {num2} + {num3} = ?"
+        else:
+            resultado_correcto = num1 * num2 - num3
+            pregunta = f"{num1} x {num2} - {num3} = ?"
+        
+        respuestas_incorrectas = set()
+        while len(respuestas_incorrectas) < 3:
+            incorrecta = random.randint(10, 100)
+            if incorrecta != resultado_correcto:
+                respuestas_incorrectas.add(incorrecta)
+        
+        respuestas = [resultado_correcto] + list(respuestas_incorrectas)
+        random.shuffle(respuestas)
+        return pregunta, resultado_correcto, respuestas
+
+    elif tipo_pregunta == "resultado_faltante":
+        # Multiplicación con número faltante
+        num1 = random.randint(1, 12)
+        num2 = random.randint(1, 12)
+        resultado_correcto = num1 * num2
+        posicion_faltante = random.choice([1, 2])  # Falta el primer número o el segundo
+
+        if posicion_faltante == 1:
+            pregunta = f"? x {num2} = {resultado_correcto}"
+            respuestas = [num1, random.randint(1, 12), random.randint(1, 12), random.randint(1, 12)]
+        else:
+            pregunta = f"{num1} x ? = {resultado_correcto}"
+            respuestas = [num2, random.randint(1, 12), random.randint(1, 12), random.randint(1, 12)]
+
+        random.shuffle(respuestas)
+        return pregunta, num1 if posicion_faltante == 1 else num2, respuestas
+
+# Función del segundo nivel
+def nivel_2(screen, volver_al_mapa):
+    preguntas_restantes = 12
+    aciertos = 0  # Contador de aciertos
+    puntos = 0    # Contador de puntos (2 puntos por acierto)
+    vidas = 7     # Vidas totales del juego (7 oportunidades en total)
+
+    while preguntas_restantes > 0 and vidas > 0:
+        # Generar una pregunta aleatoria del segundo nivel
+        pregunta, resultado_correcto, respuestas = generar_pregunta_segundo_nivel()
+
+        # Mostrar el fondo de las preguntas
+        screen.blit(fondo_pregunta, (0, 0))
+
+        # Mostrar la pregunta centrada
+        mostrar_texto_centrado(pregunta, font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 6 - 30, 300, 100), screen)
+
+        # Mostrar las respuestas dentro de los botones
+        mostrar_texto_centrado(str(respuestas[0]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 - 60, 100, 50), screen)
+        mostrar_texto_centrado(str(respuestas[1]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 - 60, 100, 50), screen)
+        mostrar_texto_centrado(str(respuestas[2]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50), screen)
+        mostrar_texto_centrado(str(respuestas[3]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50), screen)
+
+        # Mostrar los puntos y las vidas
+        mostrar_texto_centrado(f'Puntos: {puntos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 10, 190, 40), screen)
+        mostrar_texto_centrado(f'Vidas: {vidas}', small_font, BLACK, pygame.Rect(10, 10, 190, 40), screen)
+
+        # Dibujar los botones "Siguiente" y "Salir"
+        dibujar_botones(screen)
+
+        respuesta_seleccionada = None
+        ha_respondido = False  # Verifica si el jugador ya seleccionó una respuesta
+        resultado_mostrado = False
+
+        while not resultado_mostrado:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+
+                    # Detectar la respuesta seleccionada según la posición del clic
+                    if SCREEN_WIDTH // 3 - 50 <= mouse_pos[0] <= SCREEN_WIDTH // 3 + 50 and SCREEN_HEIGHT // 2 - 60 <= mouse_pos[1] <= SCREEN_HEIGHT // 2 - 10:
+                        respuesta_seleccionada = respuestas[0]
+                        ha_respondido = True
+                    elif SCREEN_WIDTH * 2 // 3 - 50 <= mouse_pos[0] <= SCREEN_WIDTH * 2 // 3 + 50 and SCREEN_HEIGHT // 2 - 60 <= mouse_pos[1] <= SCREEN_HEIGHT // 2 - 10:
+                        respuesta_seleccionada = respuestas[1]
+                        ha_respondido = True
+                    elif SCREEN_WIDTH // 3 - 50 <= mouse_pos[0] <= SCREEN_WIDTH // 3 + 50 and SCREEN_HEIGHT // 2 + 40 - 50 <= mouse_pos[1] <= SCREEN_HEIGHT // 2 + 90:
+                        respuesta_seleccionada = respuestas[2]
+                        ha_respondido = True
+                    elif SCREEN_WIDTH * 2 // 3 - 50 <= mouse_pos[0] <= SCREEN_WIDTH * 2 // 3 + 50 and SCREEN_HEIGHT // 2 + 40 - 50 <= mouse_pos[1] <= SCREEN_HEIGHT // 2 + 90:
+                        respuesta_seleccionada = respuestas[3]
+                        ha_respondido = True
+
+                    if respuesta_seleccionada is not None:
+                        # Comprobar si la respuesta es correcta o incorrecta
+                        if respuesta_seleccionada == resultado_correcto:
+                            aciertos += 1  # Sumar un acierto
+                            puntos += 2    # Sumar 2 puntos por acierto
+                            mostrar_mensaje_con_fondo(screen, '¡Correcto!', font, WHITE, GREEN, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 150, 300, 50))
+                            pygame.display.update()
+                            pygame.time.wait(500)  # Mostrar el mensaje "¡Correcto!" por 0.5 segundos
+                            resultado_mostrado = True
+                        else:
+                            vidas -= 1  # Quitar una vida por intento fallido
+                            mostrar_mensaje_con_fondo(screen, '¡Incorrecto! Inténtalo de nuevo.', small_font, WHITE, RED, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 150, 300, 50))
+                            pygame.display.update()
+                            pygame.time.wait(500)  # Mostrar el mensaje "¡Incorrecto!" por 0.5 segundos
+                            resultado_mostrado = False  # Permitir al jugador intentar de nuevo sin avanzar
+                            # Aquí hacemos que el mensaje desaparezca y continúe
+                            continue  # Volver al bucle para que pueda seleccionar otra respuesta
+
+                    # Comprobar si se hace clic en el botón "Siguiente" para avanzar
+                    if SCREEN_WIDTH - 180 <= mouse_pos[0] <= SCREEN_WIDTH - 20 and SCREEN_HEIGHT - 80 <= mouse_pos[1] <= SCREEN_HEIGHT - 30:
+                        if not ha_respondido:
+                            vidas -= 1  # Restar una vida si el jugador no respondió antes de pasar
+                            mostrar_mensaje_con_fondo(screen, '¡Incorrecto! No respondiste.', small_font, WHITE, RED, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 150, 300, 50))
+                            pygame.display.update()
+                            pygame.time.wait(500)  # Mostrar el mensaje por 0.5 segundos
+                        resultado_mostrado = True
+
+                    # Comprobar si se hace clic en el botón "Salir"
+                    if 20 <= mouse_pos[0] <= 180 and SCREEN_HEIGHT - 80 <= mouse_pos[1] <= SCREEN_HEIGHT - 30:
+                        return volver_al_mapa()  # Regresar al mapa de niveles sin penalización
+
+            pygame.display.update()
+
+        preguntas_restantes -= 1
+
+    # Mostrar el puntaje final
+    screen.fill(WHITE)
+    mostrar_texto_centrado(f'Has terminado el nivel!', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50, 300, 50), screen)
+    mostrar_texto_centrado(f'Aciertos: {aciertos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2, 300, 50), screen)
+    mostrar_texto_centrado(f'Puntos: {puntos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 50, 300, 50), screen)
+    pygame.display.update()
+    pygame.time.wait(3000)  # Mostrar el puntaje por 3 segundos antes de volver al mapa
+
+    volver_al_mapa()
+
+# Función para mostrar un mensaje con fondo (Correcto o Incorrecto)
+def mostrar_mensaje_con_fondo(screen, mensaje, fuente, color_texto, color_fondo, rect):
+    pygame.draw.rect(screen, color_fondo, rect)
+    mostrar_texto_centrado(mensaje, fuente, color_texto, rect, screen)
+
 # Dibujar botones "Siguiente" y "Salir"
 def dibujar_botones(screen):
-    # Dibujar botón "Siguiente"
     pygame.draw.rect(screen, BLACK, (SCREEN_WIDTH - 180, SCREEN_HEIGHT - 80, 160, 50))
     mostrar_texto_centrado('Siguiente', small_font, WHITE, pygame.Rect(SCREEN_WIDTH - 180, SCREEN_HEIGHT - 80, 160, 50), screen)
 
-    # Dibujar botón "Salir"
     pygame.draw.rect(screen, BLACK, (20, SCREEN_HEIGHT - 80, 160, 50))
     mostrar_texto_centrado('Salir', small_font, WHITE, pygame.Rect(20, SCREEN_HEIGHT - 80, 160, 50), screen)
 
@@ -263,14 +437,7 @@ def nivel_1(screen, volver_al_mapa):
     if tabla_seleccionada:
         nivel(screen, volver_al_mapa, tabla_seleccionada)
 
-# Nivel 2
-def nivel_2(screen, volver_al_mapa):
-    tabla_seleccionada = menu_tabla_multiplicar(screen, volver_al_mapa)
-    if tabla_seleccionada:
-        nivel(screen, volver_al_mapa, tabla_seleccionada)
 
-# Nivel 3
+
 def nivel_3(screen, volver_al_mapa):
-    tabla_seleccionada = menu_tabla_multiplicar(screen, volver_al_mapa)
-    if tabla_seleccionada:
-        nivel(screen, volver_al_mapa, tabla_seleccionada)
+  return
