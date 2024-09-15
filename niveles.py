@@ -247,11 +247,6 @@ def game_over(screen, puntos, volver_al_mapa):
     pygame.time.wait(5000)
     volver_al_mapa()  # Redirigir al menú de selección de tablas
 
-
-import random
-import pygame
-from compartido import mostrar_texto_centrado  # Importamos la función compartida desde el archivo compartido.py
-
 # Generar una pregunta aleatoria para el segundo nivel con respuestas correctas
 def generar_pregunta_segundo_nivel():
     tipo_pregunta = random.choice(["multiplicacion_dos_digitos", "combinacion_operaciones", "resultado_faltante"])
