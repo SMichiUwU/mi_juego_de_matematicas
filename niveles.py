@@ -34,9 +34,19 @@ def generar_pregunta(tabla_seleccionada):
     num1 = tabla_seleccionada
     num2 = random.randint(1, 12)
     resultado_correcto = num1 * num2
-    respuestas = [resultado_correcto, random.randint(1, 144), random.randint(1, 144), random.randint(1, 144)]
+    
+    # Generar tres respuestas incorrectas que no sean iguales al resultado correcto
+    respuestas_incorrectas = set()
+    while len(respuestas_incorrectas) < 3:
+        respuesta = random.randint(1, 144)
+        if respuesta != resultado_correcto:
+            respuestas_incorrectas.add(respuesta)
+
+    respuestas = [resultado_correcto] + list(respuestas_incorrectas)
     random.shuffle(respuestas)
+    
     return num1, num2, resultado_correcto, respuestas
+
 
 # Menú para seleccionar la tabla de multiplicar (2 al 12)
 def menu_tabla_multiplicar(screen, volver_al_mapa):
@@ -87,11 +97,19 @@ def menu_tabla_multiplicar(screen, volver_al_mapa):
 
         pygame.display.update()
 
+# Función para mostrar un mensaje con fondo (Correcto o Incorrecto)
+def mostrar_mensaje_con_fondo(screen, mensaje, fuente, color_texto, color_fondo, rect):
+    # Dibujar el fondo (rectángulo)
+    pygame.draw.rect(screen, color_fondo, rect)
+    # Mostrar el mensaje centrado en el rectángulo
+    mostrar_texto_centrado(mensaje, fuente, color_texto, rect, screen)
+
 # Función de nivel con tabla seleccionada
 def nivel(screen, volver_al_mapa, tabla_seleccionada):
     preguntas_restantes = 12
     aciertos = 0  # Contador de aciertos
     puntos = 0    # Contador de puntos (2 puntos por acierto)
+    vidas = 5     # Vidas totales del juego (5 oportunidades en total)
 
     while preguntas_restantes > 0:
         # Mostrar el fondo de las preguntas
@@ -109,12 +127,18 @@ def nivel(screen, volver_al_mapa, tabla_seleccionada):
         mostrar_texto_centrado(str(respuestas[2]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50), screen)
         mostrar_texto_centrado(str(respuestas[3]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50), screen)
 
+        # Mostrar los puntos en la esquina superior derecha
+        mostrar_texto_centrado(f'Puntos: {puntos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 10, 190, 40), screen)
+
+        # Mostrar las vidas totales en la esquina superior izquierda
+        mostrar_texto_centrado(f'Vidas: {vidas}', small_font, BLACK, pygame.Rect(10, 10, 190, 40), screen)
+
         # Dibujar los botones "Siguiente" y "Salir"
         dibujar_botones(screen)
 
-        # Manejar eventos de selección de respuesta y botones
         respuesta_seleccionada = None
         resultado_mostrado = False
+
         while not resultado_mostrado:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -123,6 +147,23 @@ def nivel(screen, volver_al_mapa, tabla_seleccionada):
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
+
+                    # Limpiar la pantalla para quitar mensajes anteriores
+                    screen.blit(fondo_pregunta, (0, 0))
+                    mostrar_texto_centrado(f'{num1} x {num2} = ?', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 6 - 30, 300, 100), screen)
+
+                    # Volver a mostrar las respuestas y botones
+                    mostrar_texto_centrado(str(respuestas[0]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 - 60, 100, 50), screen)
+                    mostrar_texto_centrado(str(respuestas[1]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 - 60, 100, 50), screen)
+                    mostrar_texto_centrado(str(respuestas[2]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50), screen)
+                    mostrar_texto_centrado(str(respuestas[3]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50), screen)
+                    
+                    # Volver a mostrar los puntos y las vidas totales
+                    mostrar_texto_centrado(f'Puntos: {puntos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 10, 190, 40), screen)
+                    mostrar_texto_centrado(f'Vidas: {vidas}', small_font, BLACK, pygame.Rect(10, 10, 190, 40), screen)
+
+                    # Volver a dibujar botones
+                    dibujar_botones(screen)
 
                     # Detectar la respuesta seleccionada según la posición del clic
                     if SCREEN_WIDTH // 3 - 50 <= mouse_pos[0] <= SCREEN_WIDTH // 3 + 50 and SCREEN_HEIGHT // 2 - 60 <= mouse_pos[1] <= SCREEN_HEIGHT // 2 - 10:
@@ -134,24 +175,51 @@ def nivel(screen, volver_al_mapa, tabla_seleccionada):
                     elif SCREEN_WIDTH * 2 // 3 - 50 <= mouse_pos[0] <= SCREEN_WIDTH * 2 // 3 + 50 and SCREEN_HEIGHT // 2 + 40 - 50 <= mouse_pos[1] <= SCREEN_HEIGHT // 2 + 90:
                         respuesta_seleccionada = respuestas[3]
 
-                    # Comprobar si se hace clic en el botón "Siguiente"
+                    if respuesta_seleccionada is not None:
+                        # Comprobar si la respuesta es correcta o incorrecta
+                        if respuesta_seleccionada == resultado_correcto:
+                            aciertos += 1  # Sumar un acierto
+                            puntos += 2    # Sumar 2 puntos por acierto
+                            mostrar_mensaje_con_fondo(screen, '¡Correcto!', font, WHITE, GREEN, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 150, 300, 50))
+                            pygame.display.update()
+
+                            # Esperar 3 segundos y pasar a la siguiente pregunta automáticamente
+                            pygame.time.wait(1000)
+                            resultado_mostrado = True  # Salir del bucle para ir a la siguiente pregunta
+                        else:
+                            vidas -= 1  # Quitar una vida por intento fallido
+                            mostrar_mensaje_con_fondo(screen, '¡Incorrecto! Inténtalo de nuevo.', small_font, WHITE, RED, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 150, 300, 50))
+                            pygame.display.update()
+
+                            # Esperar 1 segundo para mostrar el mensaje de incorrecto y luego limpiarlo
+                            pygame.time.wait(1000)
+
+                            # Limpiar la pantalla nuevamente (solo si la respuesta es incorrecta)
+                            screen.blit(fondo_pregunta, (0, 0))
+                            mostrar_texto_centrado(f'{num1} x {num2} = ?', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 6 - 30, 300, 100), screen)
+
+                            # Volver a mostrar las respuestas, puntos y vidas
+                            mostrar_texto_centrado(str(respuestas[0]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 - 60, 100, 50), screen)
+                            mostrar_texto_centrado(str(respuestas[1]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 - 60, 100, 50), screen)
+                            mostrar_texto_centrado(str(respuestas[2]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50), screen)
+                            mostrar_texto_centrado(str(respuestas[3]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50), screen)
+                            mostrar_texto_centrado(f'Puntos: {puntos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 10, 190, 40), screen)
+                            mostrar_texto_centrado(f'Vidas: {vidas}', small_font, BLACK, pygame.Rect(10, 10, 190, 40), screen)
+
+                            dibujar_botones(screen)
+
+                            # Si el jugador pierde todas las vidas, finalizar el juego
+                            if vidas == 0:
+                                game_over(screen, puntos, volver_al_mapa)
+                                return  # Finalizar el juego
+
+                    # Comprobar si se hace clic en el botón "Siguiente" (solo disponible en caso de error)
                     if SCREEN_WIDTH - 180 <= mouse_pos[0] <= SCREEN_WIDTH - 20 and SCREEN_HEIGHT - 80 <= mouse_pos[1] <= SCREEN_HEIGHT - 30:
                         resultado_mostrado = True  # Salir del bucle cuando se presiona "Siguiente"
 
                     # Comprobar si se hace clic en el botón "Salir"
                     if 20 <= mouse_pos[0] <= 180 and SCREEN_HEIGHT - 80 <= mouse_pos[1] <= SCREEN_HEIGHT - 30:
                         return  # Regresar al menú de selección de tablas
-
-            # Mostrar si la respuesta es correcta o incorrecta
-            if respuesta_seleccionada is not None:
-                if respuesta_seleccionada == resultado_correcto:
-                    aciertos += 1  # Sumar un acierto
-                    puntos += 2    # Sumar 2 puntos por acierto
-                    mostrar_texto_centrado('¡Correcto!', font, GREEN, pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 + 150, 200, 50), screen)
-                else:
-                    mostrar_texto_centrado(f'¡Incorrecto! {num1} x {num2} = {resultado_correcto}', font, RED, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 150, 300, 50), screen)
-                                # Comprobar si la respuesta es correcta o incorrecta
-            
 
             pygame.display.update()
 
@@ -163,9 +231,21 @@ def nivel(screen, volver_al_mapa, tabla_seleccionada):
     mostrar_texto_centrado(f'Aciertos: {aciertos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2, 300, 50), screen)
     mostrar_texto_centrado(f'Puntos: {puntos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 50, 300, 50), screen)
     pygame.display.update()
-    pygame.time.wait(5000)  # Esperar 3 segundos para mostrar el puntaje
+    pygame.time.wait(5000)  # Esperar 5 segundos para mostrar el puntaje
 
     volver_al_mapa()
+
+# Función para mostrar pantalla de "Game Over" cuando el jugador pierde
+def game_over(screen, puntos, volver_al_mapa):
+    screen.fill(WHITE)
+    mostrar_texto_centrado('¡Has perdido!', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50, 300, 50), screen)
+    mostrar_texto_centrado(f'Total Puntos: {puntos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2, 300, 50), screen)
+    mostrar_texto_centrado('Inténtalo de nuevo', small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 50, 300, 50), screen)
+    pygame.display.update()
+    
+    # Esperar 5 segundos antes de volver al mapa de tablas
+    pygame.time.wait(5000)
+    volver_al_mapa()  # Redirigir al menú de selección de tablas
 
 # Dibujar botones "Siguiente" y "Salir"
 def dibujar_botones(screen):
