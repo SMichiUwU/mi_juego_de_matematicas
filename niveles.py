@@ -560,10 +560,6 @@ def nivel_1(screen, volver_al_mapa):
 
 #-------------- nivel tres 
 
-import pygame
-import random
-import sys
-
 # Definir colores y configuración
 COLOR_JUGADOR = (0, 255, 0)  # Verde para la barra de vida del jugador
 COLOR_ENEMIGO = (255, 0, 0)  # Rojo para la barra de vida del enemigo
@@ -676,6 +672,7 @@ def nivel_3(screen, volver_al_mapa):
         rect_respuestas = [
             pygame.Rect(100 + i * 150, 250, 100, 50)  # Posiciones alineadas más arriba en la pantalla
             for i in range(4)
+            
         ]
 
         for idx, rect in enumerate(rect_respuestas):

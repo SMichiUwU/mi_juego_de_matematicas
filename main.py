@@ -1,7 +1,7 @@
 import pygame
 import sys
-from niveles import nivel_1, nivel_2, nivel_3  # Importamos los niveles
-from compartido import mostrar_texto_centrado  # Importamos la función compartida
+from menu_niveles import mapa_niveles
+
 
 # Inicializar Pygame
 pygame.init()
@@ -10,56 +10,79 @@ pygame.init()
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 480
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption('Juego de Matemáticas - Mapa de Niveles')
+pygame.display.set_caption('Menú Principal - Juego Educativo')
 
-# Cargar imagen de fondo del mapa
-mapa_fondo = pygame.image.load(r'imagenes/mapa_juego.jpg')
-mapa_fondo = pygame.transform.scale(mapa_fondo, (SCREEN_WIDTH, SCREEN_HEIGHT))
+# Colores
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+BLUE = (0, 0, 255)
 
-# Definir posiciones de los niveles en el mapa (x, y, radio del círculo ajustado)
-niveles = {
-    'Nivel 1': (150, 200, 40),  # Coordenadas (x, y) y radio del círculo más pequeño
-    'Nivel 2': (400, 150, 40),
-    'Nivel 3': (650, 300, 40)
-}
+# Cargar imagen de fondo (opcional, si tienes una imagen para el fondo del menú principal)
+fondo_menu = pygame.image.load(r'imagenes/fondo_menu.jpg')
+fondo_menu = pygame.transform.scale(fondo_menu, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-# Cargar fuentes
-font = pygame.font.Font(None, 60)  # Fuente más pequeña para adaptarse a la pantalla
+# Definir fuentes
+font = pygame.font.Font(None, 50)
 
-# Función para mostrar el número dentro de un círculo
-def mostrar_numero(numero, fuente, color, x, y):
-    superficie = fuente.render(numero, True, color)
-    rect = superficie.get_rect()
-    rect.center = (x, y)
-    screen.blit(superficie, rect)
+# Función para mostrar texto centrado en un botón
+def mostrar_texto_centrado(superficie, texto, x, y, ancho, alto, color):
+    label = font.render(texto, True, color)
+    rect = label.get_rect(center=(x + ancho // 2, y + alto // 2))
+    superficie.blit(label, rect)
 
-# Función para el mapa de selección de niveles
-def mapa_niveles():
+# Función para mostrar el menú principal
+def menu_principal():
     while True:
-        screen.blit(mapa_fondo, (0, 0))  # Dibujar fondo del mapa
+        # Dibujar el fondo del menú
+        screen.blit(fondo_menu, (0, 0))
 
-        # Dibujar los círculos de los niveles y los números en ellos
-        for i, (nivel, (x, y, radio)) in enumerate(niveles.items(), start=1):
-            pygame.draw.circle(screen, (255, 0, 0), (x, y), radio)  # Círculos rojos más pequeños
-            mostrar_numero(str(i), font, (255, 255, 255), x, y)  # Números en blanco dentro de los círculos
+        # Definir botones del menú principal
+        boton_juego = pygame.Rect(250, 120, 300, 70)
+        boton_opcion2 = pygame.Rect(250, 220, 300, 70)
+        boton_acerca = pygame.Rect(250, 320, 300, 70)
 
-        # Manejar eventos de selección de nivel
+        # Dibujar los botones
+        pygame.draw.rect(screen, RED, boton_juego)
+        
+        pygame.draw.rect(screen, BLUE, boton_opcion2)
+        pygame.draw.rect(screen, (0, 200, 0), boton_acerca)
+
+        # Mostrar texto en cada botón
+        mostrar_texto_centrado(screen, 'Juego de Niveles', boton_juego.x, boton_juego.y, boton_juego.width, boton_juego.height, WHITE)
+        mostrar_texto_centrado(screen, 'Interaccion', boton_opcion2.x, boton_opcion2.y, boton_opcion2.width, boton_opcion2.height, WHITE)
+        mostrar_texto_centrado(screen, 'Acerca de', boton_acerca.x, boton_acerca.y, boton_acerca.width, boton_acerca.height, WHITE)
+
+        # Manejar eventos
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = pygame.mouse.get_pos()
-                for i, (nivel, (x, y, radio)) in enumerate(niveles.items(), start=1):
-                    if (x - radio) <= mouse_pos[0] <= (x + radio) and (y - radio) <= mouse_pos[1] <= (y + radio):
-                        if i == 1:
-                            nivel_1(screen, mapa_niveles)  # Inicia Nivel 1
-                        elif i == 2:
-                            nivel_2(screen, mapa_niveles)  # Inicia Nivel 2
-                        elif i == 3:
-                            nivel_3(screen, mapa_niveles)  # Inicia Nivel 3
+                if boton_juego.collidepoint(event.pos):
+                    mapa_niveles()  # Llamar a la función `mapa_niveles` cuando se presione el botón Juego de Niveles
+                elif boton_opcion2.collidepoint(event.pos):
+                    print("Segunda Opción seleccionada (por definir).")
+                elif boton_acerca.collidepoint(event.pos):
+                    mostrar_acerca()  # Llamar a la función `mostrar_acerca` cuando se presione el botón Acerca de
 
         pygame.display.update()
 
-# Ejecutar el mapa de niveles
-mapa_niveles()
+# Función para mostrar información acerca del proyecto
+def mostrar_acerca():
+    while True:
+        screen.fill(BLACK)
+        mostrar_texto_centrado(screen, 'Juego creado por el equipo de Desarrollo.', 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, WHITE)
+        mostrar_texto_centrado(screen, 'Presiona cualquier tecla para regresar.', 0, 100, SCREEN_WIDTH, SCREEN_HEIGHT, WHITE)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                menu_principal()  # Regresar al menú principal
+
+        pygame.display.update()
+
+# Ejecutar el menú principal
+menu_principal()
