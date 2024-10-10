@@ -692,7 +692,7 @@ def nivel_3(screen, volver_al_mapa):
     max_rondas = 5
 
     # Fondo de pantalla para la batalla
-    fondo_pregunta = pygame.image.load(r'imagenes/nivel3.png')
+    fondo_pregunta = pygame.image.load(r'imagenes/nivel3_modified (3).png')
     fondo_pregunta = pygame.transform.scale(fondo_pregunta, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
     while vida_jugador > 0 and vida_enemigo > 0 and ronda_actual <= max_rondas:
