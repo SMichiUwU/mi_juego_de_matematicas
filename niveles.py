@@ -29,6 +29,12 @@ fondo_menu = pygame.transform.scale(fondo_menu, (SCREEN_WIDTH, SCREEN_HEIGHT))
 fondo_pregunta = pygame.image.load(r'imagenes/fondo_preguntas.png')
 fondo_pregunta = pygame.transform.scale(fondo_pregunta, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
+# Función para desbloquear el siguiente nivel (importada desde menu_niveles.py)
+def desbloquear_nivel(nivel_actual):
+    import menu_niveles
+    menu_niveles.niveles_desbloqueados[nivel_actual] = True
+    
+
 # Generar una pregunta de multiplicación aleatoria basada en la tabla seleccionada
 def generar_pregunta(tabla_seleccionada):
     num1 = tabla_seleccionada
@@ -558,9 +564,9 @@ def nivel_1(screen, volver_al_mapa):
 
 
 
-#-------------- nivel tres 
+#-------------- nivel tres -----------
 
-# Definir colores y configuración
+# Definir colores
 COLOR_JUGADOR = (0, 255, 0)  # Verde para la barra de vida del jugador
 COLOR_ENEMIGO = (255, 0, 0)  # Rojo para la barra de vida del enemigo
 COLOR_FONDO = (200, 200, 200)  # Fondo de pantalla para contraste
@@ -571,12 +577,10 @@ COLOR_BOTONES = (255, 255, 255)  # Blanco para los botones de respuesta
 VIDA_JUGADOR = 100
 VIDA_ENEMIGO = 100
 
-# Configuración de tamaño de pantalla y fuentes
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 480
-pygame.init()
-font = pygame.font.Font(None, 30)  # Tamaño de fuente ajustado para el enunciado
-small_font = pygame.font.Font(None, 28)  # Fuente ajustada para las respuestas
+# Cargar fuentes
+font = pygame.font.Font(None, 60)  # Tamaño de fuente ajustado para el enunciado
+small_font = pygame.font.Font(None, 50)  # Fuente ajustada para las respuestas
+large_font = pygame.font.Font(None, 80)  # Fuente grande para el texto final
 
 # Cargar imágenes del jugador y del enemigo
 imagen_jugador = pygame.image.load(r'imagenes/jugador.png')
@@ -591,16 +595,49 @@ imagen_espada = pygame.transform.scale(imagen_espada, (50, 10))  # Redimensionar
 imagen_lanza = pygame.image.load(r'imagenes/lanza.png')  # Imagen de la lanza del enemigo
 imagen_lanza = pygame.transform.scale(imagen_lanza, (50, 10))  # Redimensionar para proyectil
 
+# Cargar sonidos
+sonido_correcto = pygame.mixer.Sound(r'sonidos/correctoarco.mp3')
+sonido_incorrecto = pygame.mixer.Sound(r'sonidos/enemigo_te_pega.mp3')
+sonido_victoria = pygame.mixer.Sound(r'sonidos/GANASTE_MED.mp3')
+sonido_derrota = pygame.mixer.Sound(r'sonidos/PERDISTE.mp3')
+
+#funciones auxiliares del nivel 3-----------------------------------------------
 # Generar preguntas de razonamiento basadas en multiplicación para la batalla
 def generar_pregunta_razonamiento_multiplicacion():
     preguntas = [
         ("Si tengo 4 cajas y cada caja tiene 5 manzanas, ¿cuántas manzanas hay en total?", 20, [10, 15, 20, 25]),
-        ("¿Cuántas ruedas hay en 7 coches si cada coche tiene 4 ruedas?", 28, [24, 28, 32, 30]),
-        ("Si hay 3 grupos de 8 niños, ¿cuántos niños hay en total?", 24, [16, 20, 24, 32]),
-        ("Un edificio tiene 5 pisos y cada piso tiene 6 ventanas, ¿cuántas ventanas hay?", 30, [20, 25, 30, 35]),
-        ("En un cine hay 9 filas con 12 asientos cada una, ¿cuántos asientos hay en total?", 108, [100, 108, 120, 112]),
-        ("Si compras 6 paquetes con 7 caramelos cada uno, ¿cuántos caramelos tienes?", 42, [36, 42, 45, 49]),
-        ("Hay 8 cajas y cada caja contiene 9 libros, ¿cuántos libros hay en total?", 72, [72, 64, 81, 88])
+        ("¿Cuántas ruedas hay en 3 coches si cada coche tiene 4 ruedas?", 12, [8, 12, 16, 20]),
+        ("Si hay 2 grupos de 6 niños, ¿cuántos niños hay en total?", 12, [10, 12, 14, 16]),
+        ("Un edificio tiene 3 pisos y cada piso tiene 4 ventanas, ¿cuántas ventanas hay?", 12, [8, 10, 12, 14]),
+        ("En un cine hay 5 filas con 6 asientos cada una, ¿cuántos asientos hay en total?", 30, [25, 30, 35, 40]),
+        ("Si compras 3 paquetes con 4 caramelos cada uno, ¿cuántos caramelos tienes?", 12, [10, 12, 14, 16]),
+        ("Hay 4 cajas y cada caja contiene 5 libros, ¿cuántos libros hay en total?", 20, [15, 20, 25, 30]),
+        ("Si tengo 2 bolsas y cada bolsa tiene 3 naranjas, ¿cuántas naranjas hay en total?", 6, [4, 6, 8, 10]),
+        ("¿Cuántos días hay en 2 semanas?", 14, [10, 12, 14, 16]),
+        ("Si hay 1 docena de huevos, ¿cuántos huevos hay en total?", 12, [10, 12, 14, 16]),
+        ("Un tren tiene 2 vagones y cada vagón tiene 3 asientos, ¿cuántos asientos hay en total?", 6, [4, 6, 8, 10]),
+        ("Si compras 2 paquetes con 3 galletas cada uno, ¿cuántas galletas tienes?", 6, [4, 6, 8, 10]),
+        ("Hay 3 cajas y cada caja contiene 4 juguetes, ¿cuántos juguetes hay en total?", 12, [10, 12, 14, 16]),
+        ("Si tengo 2 filas de 3 sillas cada una, ¿cuántas sillas hay en total?", 6, [4, 6, 8, 10]),
+        ("¿Cuántos minutos hay en 1 hora?", 60, [30, 45, 60, 75]),
+        ("Si hay 2 grupos de 3 niños, ¿cuántos niños hay en total?", 6, [4, 6, 8, 10]),
+        ("Un edificio tiene 2 pisos y cada piso tiene 3 ventanas, ¿cuántas ventanas hay?", 6, [4, 6, 8, 10]),
+        ("En un cine hay 3 filas con 4 asientos cada una, ¿cuántos asientos hay en total?", 12, [10, 12, 14, 16]),
+        ("Si compras 2 paquetes con 3 caramelos cada uno, ¿cuántos caramelos tienes?", 6, [4, 6, 8, 10]),
+        ("Hay 2 cajas y cada caja contiene 3 libros, ¿cuántos libros hay en total?", 6, [4, 6, 8, 10]),
+        ("Si tengo 3 bolsas y cada bolsa tiene 4 manzanas, ¿cuántas manzanas hay en total?", 12, [10, 12, 14, 16]),
+        ("¿Cuántos días hay en 3 semanas?", 21, [14, 18, 21, 24]),
+        ("Si hay 2 docenas de huevos, ¿cuántos huevos hay en total?", 24, [20, 24, 28, 32]),
+        ("Un tren tiene 3 vagones y cada vagón tiene 4 asientos, ¿cuántos asientos hay en total?", 12, [10, 12, 14, 16]),
+        ("Si compras 3 paquetes con 4 galletas cada uno, ¿cuántas galletas tienes?", 12, [10, 12, 14, 16]),
+        ("Hay 4 cajas y cada caja contiene 5 juguetes, ¿cuántos juguetes hay en total?", 20, [15, 20, 25, 30]),
+        ("Si tengo 3 filas de 4 sillas cada una, ¿cuántas sillas hay en total?", 12, [10, 12, 14, 16]),
+        ("¿Cuántos minutos hay en 2 horas?", 120, [90, 100, 120, 150]),
+        ("Si hay 3 grupos de 4 niños, ¿cuántos niños hay en total?", 12, [10, 12, 14, 16]),
+        ("Un edificio tiene 4 pisos y cada piso tiene 5 ventanas, ¿cuántas ventanas hay?", 20, [15, 20, 25, 30]),
+        ("En un cine hay 4 filas con 5 asientos cada una, ¿cuántos asientos hay en total?", 20, [15, 20, 25, 30]),
+        ("Si compras 5 paquetes con 6 caramelos cada uno, ¿cuántos caramelos tienes?", 30, [25, 30, 35, 40]),
+        ("Hay 3 cajas y cada caja contiene 4 libros, ¿cuántos libros hay en total?", 12, [10, 12, 14, 16])
     ]
     pregunta, respuesta_correcta, opciones = random.choice(preguntas)
     return pregunta, respuesta_correcta, opciones
@@ -625,22 +662,28 @@ def animar_ataque(screen, proyectil, inicio_x, inicio_y, final_x, final_y, veloc
         screen.fill(COLOR_FONDO, (x, y, proyectil.get_width(), proyectil.get_height()))  # Limpiar la posición anterior
         x += velocidad if inicio_x < final_x else -velocidad  # Mover en la dirección correcta
 
-# Función para dividir y centrar el enunciado en dos líneas
-def mostrar_texto_doble_linea(texto, fuente, color, rect, screen):
+# Función para dividir y centrar el enunciado en varias líneas
+def mostrar_texto_multilinea(texto, fuente, color, rect, screen):
     palabras = texto.split()
-    linea1 = " ".join(palabras[:len(palabras) // 2])
-    linea2 = " ".join(palabras[len(palabras) // 2:])
+    lineas = []
+    linea_actual = ""
     
-    # Mostrar la primera línea en la mitad superior del rectángulo
-    texto_surface1 = fuente.render(linea1, True, color)
-    texto_rect1 = texto_surface1.get_rect(center=(rect.x + rect.width // 2, rect.y + rect.height // 4))
-    screen.blit(texto_surface1, texto_rect1)
+    for palabra in palabras:
+        if fuente.size(linea_actual + " " + palabra)[0] < rect.width:
+            linea_actual += " " + palabra
+        else:
+            lineas.append(linea_actual)
+            linea_actual = palabra
     
-    # Mostrar la segunda línea en la mitad inferior del rectángulo
-    texto_surface2 = fuente.render(linea2, True, color)
-    texto_rect2 = texto_surface2.get_rect(center=(rect.x + rect.width // 2, rect.y + 3 * rect.height // 4))
-    screen.blit(texto_surface2, texto_rect2)
+    lineas.append(linea_actual)
+    
+    for i, linea in enumerate(lineas):
+        texto_surface = fuente.render(linea.strip(), True, color)
+        texto_rect = texto_surface.get_rect(center=(rect.x + rect.width // 2, rect.y + (i + 1) * (rect.height // (len(lineas) + 1))))
+        screen.blit(texto_surface, texto_rect)
 
+
+#LÓGICA DEL NIVEL 3------------------------------------------------------------------
 # Función de nivel 3 - Batalla Matemática
 def nivel_3(screen, volver_al_mapa):
     vida_jugador = VIDA_JUGADOR
@@ -665,14 +708,13 @@ def nivel_3(screen, volver_al_mapa):
 
         # Generar pregunta y mostrarla
         pregunta, respuesta_correcta, respuestas = generar_pregunta_razonamiento_multiplicacion()
-        # Mostrar la pregunta en dos líneas, posicionada más abajo para dejar espacio para la barra de vida
-        mostrar_texto_doble_linea(pregunta, font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 300, 120, 600, 100), screen)
+        # Mostrar la pregunta en varias líneas, posicionada más abajo para dejar espacio para la barra de vida
+        mostrar_texto_multilinea(pregunta, font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 350, 100, 700, 150), screen)
 
         # Dibujar respuestas en una sola fila, más arriba en la pantalla (altura de 250)
         rect_respuestas = [
             pygame.Rect(100 + i * 150, 250, 100, 50)  # Posiciones alineadas más arriba en la pantalla
             for i in range(4)
-            
         ]
 
         for idx, rect in enumerate(rect_respuestas):
@@ -701,11 +743,13 @@ def nivel_3(screen, volver_al_mapa):
             # El jugador ataca al enemigo con la espada
             animar_ataque(screen, imagen_espada, 150, SCREEN_HEIGHT - 100, SCREEN_WIDTH - 150, SCREEN_HEIGHT - 100)
             vida_enemigo -= 20
+            sonido_correcto.play()  # Reproducir sonido correcto
             mostrar_texto_centrado('¡Correcto! Atacaste al enemigo.', small_font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 50, 300, 50), screen)
         else:
             # El enemigo ataca al jugador con la lanza hacia la izquierda
             animar_ataque(screen, imagen_lanza, SCREEN_WIDTH - 150, SCREEN_HEIGHT - 100, 150, SCREEN_HEIGHT - 100)
             vida_jugador -= 20
+            sonido_incorrecto.play()  # Reproducir sonido incorrecto
             mostrar_texto_centrado('¡Incorrecto! El enemigo te atacó.', small_font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 50, 300, 50), screen)
 
         pygame.display.update()
@@ -716,14 +760,18 @@ def nivel_3(screen, volver_al_mapa):
     # Final de la batalla
     screen.fill(COLOR_FONDO)
     if vida_enemigo <= 0:
-        mostrar_texto_centrado('¡Ganaste la batalla!', font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50, 300, 50), screen)
+        sonido_victoria.play()  # Reproducir sonido de victoria
+        mostrar_texto_centrado('¡Batalla terminada!', large_font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 300, SCREEN_HEIGHT // 2 - 50, 600, 100), screen)
+        mostrar_texto_centrado('¡Ganaste la batalla! YEY :D XD!!!!', large_font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 300, SCREEN_HEIGHT // 2 - 50, 600, 100), screen)
     elif vida_jugador <= 0:
-        mostrar_texto_centrado('¡Perdiste la batalla!', font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50, 300, 50), screen)
-    else:
-        mostrar_texto_centrado('¡Batalla terminada!', font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50, 300, 50), screen)
+        sonido_derrota.play()  # Reproducir sonido de derrota
+        mostrar_texto_centrado('¡Batalla terminada!', large_font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 300, SCREEN_HEIGHT // 2 - 50, 600, 100), screen)
+        mostrar_texto_centrado('¡Perdiste la batalla! :C ', large_font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 300, SCREEN_HEIGHT // 2 - 50, 600, 100), screen)
+        mostrar_texto_centrado('¡Sigue practicando!', large_font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 300, SCREEN_HEIGHT // 2 + 50, 600, 100), screen)
+        
 
     pygame.display.update()
-    pygame.time.wait(3000)  # Pausa antes de volver al mapa
+    pygame.time.wait(5000)  # Pausa antes de volver al mapa
 
     volver_al_mapa()  # Volver al mapa de niveles
 
@@ -733,4 +781,3 @@ def mostrar_texto_centrado(texto, fuente, color, rect, screen):
     texto_rect = superficie.get_rect()
     texto_rect.center = (rect.x + rect.width // 2, rect.y + rect.height // 2)
     screen.blit(superficie, texto_rect)
-

@@ -21,7 +21,7 @@ BLUE = (0, 0, 255)
 GREEN = (0, 200, 0)
 
 # Cargar imagen de fondo
-fondo_menu = pygame.image.load(r'imagenes/fondo_menu.jpg')
+fondo_menu = pygame.image.load(r'imagenes/mapa_juego2.png')
 fondo_menu = pygame.transform.scale(fondo_menu, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Cargar sonidos y música
