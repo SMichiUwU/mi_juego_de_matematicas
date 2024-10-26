@@ -2,6 +2,7 @@ import os
 import pygame
 import sys
 from niveles import nivel_1, nivel_2, nivel_3  # Importar los niveles
+from compartido import obtener_ruta_recurso, font_mediana  # Importar funciones compartidas
 
 # Determina el directorio base del script
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -20,7 +21,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Juego de Matemáticas - Mapa de Niveles')
 
 # Cargar imagen de fondo del mapa
-mapa_fondo = pygame.image.load(obtener_ruta_recurso('imagenes/mapa_juego.jpg'))
+mapa_fondo = pygame.image.load(obtener_ruta_recurso('imagenes/mapa_juego.png'))
 mapa_fondo = pygame.transform.scale(mapa_fondo, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Cargar sonidos y música
@@ -48,9 +49,6 @@ musica_activada = True  # Música activada al inicio
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
-# Definir fuentes
-font = pygame.font.Font(None, 60)
-small_font = pygame.font.Font(None, 24)
 
 # Cargar íconos de sonido
 icono_sonido_on = pygame.image.load(obtener_ruta_recurso('imagenes/sonido_on.png'))
@@ -60,13 +58,13 @@ icono_sonido_off = pygame.transform.scale(icono_sonido_off, (50, 50))
 
 # Función para mostrar texto centrado en un rectángulo
 def mostrar_texto_centrado(superficie, texto, x, y, ancho, alto, color):
-    label = font.render(texto, True, color)
+    label = font_mediana.render(texto, True, color)
     rect = label.get_rect(center=(x + ancho // 2, y + alto // 2))
     superficie.blit(label, rect)
 
 # Función para mostrar el número dentro de un círculo
 def mostrar_numero(numero, fuente, color, x, y):
-    superficie = fuente.render(numero, True, color)
+    superficie = font_mediana.render(numero, True, color)
     rect = superficie.get_rect()
     rect.center = (x, y)
     screen.blit(superficie, rect)
@@ -81,11 +79,11 @@ def mapa_niveles():
         # Dibujar los círculos de los niveles y los números en ellos
         for i, (nivel, (x, y, radio)) in enumerate(niveles.items(), start=1):
             pygame.draw.circle(screen, (255, 0, 0), (x, y), radio)  # Dibujar círculos en color rojo
-            mostrar_numero(str(i), font, (255, 255, 255), x, y)  # Números en blanco dentro de los círculos
+            mostrar_numero(str(i), font_mediana, (255, 255, 255), x, y)  # Números en blanco dentro de los círculos
 
         # Dibujar botones adicionales (Sonido y Menú Principal)
-        boton_sonido = pygame.Rect(700, 20, 50, 50)
-        boton_menu = pygame.Rect(20, 20, 150, 50)
+        boton_sonido = pygame.Rect(700, 10, 50, 50)
+        boton_menu = pygame.Rect(10, 10, 150, 50)
 
         # Dibujar el icono de sonido según el estado actual
         if musica_activada:

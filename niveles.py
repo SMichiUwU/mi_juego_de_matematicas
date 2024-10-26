@@ -3,7 +3,7 @@ import pygame
 import sys
 import random
 import speech_recognition as sr  # Importar speech_recognition para entrada de voz
-from compartido import mostrar_texto_centrado  # Importamos la función compartida desde el archivo compartido.py
+from compartido import mostrar_texto_centrado,font_mediana,font_principal,small_font_tabla,smaller_font,small_font  # Importamos la función compartida desde el archivo compartido.py
 
 # Determina el directorio base del script
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -24,20 +24,24 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
-
-# Cargar fuentes
-font = pygame.font.Font(obtener_ruta_recurso('fuentes/GamestationCond.otf'), 40)
-small_font = pygame.font.Font(obtener_ruta_recurso('fuentes/GamestationCond.otf'), 20)
-small_fontTabla = pygame.font.Font(obtener_ruta_recurso('fuentes/GamestationCond.otf'), 40)
-smaller_font = pygame.font.Font(obtener_ruta_recurso('fuentes/GamestationCond.otf'), 18)
+GRAYDARK = (169, 169, 169)
 
 # Cargar imagen de fondo
-fondo_menu = pygame.image.load(obtener_ruta_recurso('imagenes/Fondo_menu.png'))
+fondo_menu = pygame.image.load(obtener_ruta_recurso('imagenes/imagen_fondo_lvl1.png'))
 fondo_menu = pygame.transform.scale(fondo_menu, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Cargar imagen de fondo para las preguntas
-fondo_pregunta = pygame.image.load(obtener_ruta_recurso('imagenes/fondo_preguntas.png'))
-fondo_pregunta = pygame.transform.scale(fondo_pregunta, (SCREEN_WIDTH, SCREEN_HEIGHT))
+fondo_preguntalvl1 = pygame.image.load(obtener_ruta_recurso('imagenes/fondo_preguntas_lvl1.png'))
+fondo_preguntalvl1 = pygame.transform.scale(fondo_preguntalvl1, (SCREEN_WIDTH, SCREEN_HEIGHT))
+fondo_preguntalvl2 = pygame.image.load(obtener_ruta_recurso('imagenes/fondo_preguntas_lvl2.png'))
+fondo_preguntalvl2 = pygame.transform.scale(fondo_preguntalvl2, (SCREEN_WIDTH, SCREEN_HEIGHT))
+fondo_preguntalvl3 = pygame.image.load(obtener_ruta_recurso('imagenes/fondo_preguntas_lvl3.png'))
+fondo_preguntalvl3 = pygame.transform.scale(fondo_preguntalvl3, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+
+# Cargar sonidos
+sonido_click = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/button_09-190435.mp3'))  # Sonido de clic en botones
+
 
 # Función para desbloquear el siguiente nivel (importada desde menu_niveles.py)
 def desbloquear_nivel(nivel_actual):
@@ -71,27 +75,27 @@ def menu_tabla_multiplicar(screen, volver_al_mapa):
 
         # Definir posiciones exactas de los botones en la imagen
         botones = {
-            'Tabla del 2': pygame.Rect(110, 180, 170, 60),
-            'Tabla del 3': pygame.Rect(110, 240, 170, 60),
-            'Tabla del 4': pygame.Rect(110, 300, 170, 60),
-            'Tabla del 5': pygame.Rect(110, 360, 170, 60),
-            'Tabla del 6': pygame.Rect(320, 180, 170, 60),
-            'Tabla del 7': pygame.Rect(320, 240, 170, 60),
-            'Tabla del 8': pygame.Rect(320, 300, 170, 60),
-            'Tabla del 9': pygame.Rect(320, 360, 170, 60),
-            'Tabla del 10': pygame.Rect(530, 180, 170, 60),
-            'Tabla del 11': pygame.Rect(530, 240, 170, 60),
-            'Tabla del 12': pygame.Rect(530, 300, 170, 60)
+            'Tabla del 2': pygame.Rect(100, 175, 170, 60),
+            'Tabla del 3': pygame.Rect(100, 242, 170, 60),
+            'Tabla del 4': pygame.Rect(100, 307, 170, 60),
+            'Tabla del 5': pygame.Rect(100, 370, 170, 60),
+            'Tabla del 6': pygame.Rect(320, 175, 170, 60),
+            'Tabla del 7': pygame.Rect(320, 242, 170, 60),
+            'Tabla del 8': pygame.Rect(320, 307, 170, 60),
+            'Tabla del 9': pygame.Rect(320, 370, 170, 60),
+            'Tabla del 10': pygame.Rect(532, 175, 170, 60),
+            'Tabla del 11': pygame.Rect(532, 242, 170, 60),
+            'Tabla del 12': pygame.Rect(532, 307, 170, 60)
         }
 
         # Dibujar botón "ATRÁS" en la esquina superior izquierda
         boton_atras = pygame.Rect(10, 10, 100, 40)
         pygame.draw.rect(screen, BLACK, boton_atras)
-        mostrar_texto_centrado('ATRÁS', smaller_font, WHITE, boton_atras, screen)
+        mostrar_texto_centrado('Volver', smaller_font, WHITE, boton_atras, screen)
 
         # Mostrar el texto en los botones, alineado y centrado
         for tabla, rect in botones.items():
-            mostrar_texto_centrado(tabla, smaller_font, WHITE, rect, screen)
+            mostrar_texto_centrado(tabla, smaller_font, BLACK, rect, screen)
 
         # Manejar eventos
         for event in pygame.event.get():
@@ -117,14 +121,14 @@ def menu_tabla_multiplicar(screen, volver_al_mapa):
 def mostrar_explicacion(screen, nivel):
     screen.fill(WHITE)
     if nivel == 1:
-        texto = "Nivel 1: Practica las tablas de multiplicar seleccionadas."
+        texto = "Nivel 1: Practica las tablas de multiplicar seleccionadas"
     elif nivel == 2:
-        texto = "Nivel 2: Resuelve multiplicaciones más avanzadas."
+        texto = "Nivel 2: Resuelve multiplicaciones más avanzadas"
     elif nivel == 3:
-        texto = "Nivel 3: ¡Batalla matemática! Responde para derrotar al enemigo."
+        texto = "Nivel 3: ¡Batalla matemática! Responde para derrotar al enemigo"
     else:
         texto = "Bienvenido al juego de matemáticas."
-    mostrar_texto_multilinea(texto, font, BLACK, pygame.Rect(50, 100, SCREEN_WIDTH - 100, SCREEN_HEIGHT - 200), screen)
+    mostrar_texto_multilinea(texto, font_principal, BLACK, pygame.Rect(50, 100, SCREEN_WIDTH - 100, SCREEN_HEIGHT - 200), screen)
     pygame.display.update()
     pygame.time.wait(4000)  # Mostrar la explicación por 5 segundos
 
@@ -146,12 +150,14 @@ def entrada_de_voz():
             return ""
 
 # Función para mostrar un mensaje con fondo (Correcto o Incorrecto)
-def mostrar_mensaje_con_fondo(screen, mensaje, fuente, color_texto, color_fondo, rect):
+def mostrar_mensaje_con_fondo(screen, mensaje, small_font, color_texto, color_fondo, rect):
     # Dibujar el fondo (rectángulo)
     pygame.draw.rect(screen, color_fondo, rect)
     # Mostrar el mensaje centrado en el rectángulo
-    mostrar_texto_centrado(mensaje, fuente, color_texto, rect, screen)
+    mostrar_texto_centrado(mensaje, small_font, color_texto, rect, screen)
 
+
+#-----------------NIVEL 1-----------------------
 # Función de nivel con tabla seleccionada
 def nivel(screen, volver_al_mapa, tabla_seleccionada):
     mostrar_explicacion(screen, 1)  # Mostrar explicación del nivel 1
@@ -163,25 +169,31 @@ def nivel(screen, volver_al_mapa, tabla_seleccionada):
 
     while preguntas_restantes > 0:
         # Mostrar el fondo de las preguntas
-        screen.blit(fondo_pregunta, (0, 0))
+        screen.blit(fondo_preguntalvl1, (0, 0))
 
         # Generar una pregunta aleatoria
         num1, num2, resultado_correcto, respuestas = generar_pregunta(tabla_seleccionada)
 
         # Mostrar la pregunta (centrada dentro del marco superior)
-        mostrar_texto_centrado(f'{num1} x {num2} = ?', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 6 - 30, 300, 100), screen)
+        mostrar_texto_centrado(f'{num1} x {num2} = ?', font_principal, BLACK, pygame.Rect(270, 60, 300, 100), screen)
 
-        # Mostrar las respuestas dentro de los botones rojos
-        mostrar_texto_centrado(str(respuestas[0]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 - 60, 100, 50), screen)
-        mostrar_texto_centrado(str(respuestas[1]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 - 60, 100, 50), screen)
-        mostrar_texto_centrado(str(respuestas[2]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50), screen)
-        mostrar_texto_centrado(str(respuestas[3]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50), screen)
+        # Definir posiciones de los botones de respuesta
+        rect_respuesta_1 = pygame.Rect(220, 188, 100, 50)
+        rect_respuesta_2 = pygame.Rect(490, 188, 100, 50)
+        rect_respuesta_3 = pygame.Rect(220, 288, 100, 50)
+        rect_respuesta_4 = pygame.Rect(490, 288, 100, 50)
+
+        # Mostrar las respuestas dentro de los botones
+        mostrar_texto_centrado(str(respuestas[0]), small_font_tabla, BLACK, rect_respuesta_1, screen)
+        mostrar_texto_centrado(str(respuestas[1]), small_font_tabla, BLACK, rect_respuesta_2, screen)
+        mostrar_texto_centrado(str(respuestas[2]), small_font_tabla, BLACK, rect_respuesta_3, screen)
+        mostrar_texto_centrado(str(respuestas[3]), small_font_tabla, BLACK, rect_respuesta_4, screen)
 
         # Mostrar los puntos en la esquina superior derecha
-        mostrar_texto_centrado(f'Puntos: {puntos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 10, 190, 40), screen)
+        mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 10, 190, 40), screen)
 
         # Mostrar las vidas totales en la esquina superior izquierda
-        mostrar_texto_centrado(f'Vidas: {vidas}', small_font, BLACK, pygame.Rect(10, 10, 190, 40), screen)
+        mostrar_texto_centrado(f'Vidas: {vidas}', font_principal, BLACK, pygame.Rect(10, 10, 190, 40), screen)
 
         # Dibujar los botones "Siguiente", "Salir" y "Voz"
         dibujar_botones(screen)
@@ -199,18 +211,25 @@ def nivel(screen, volver_al_mapa, tabla_seleccionada):
                     mouse_pos = pygame.mouse.get_pos()
 
                     # Limpiar la pantalla para quitar mensajes anteriores
-                    screen.blit(fondo_pregunta, (0, 0))
-                    mostrar_texto_centrado(f'{num1} x {num2} = ?', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 6 - 30, 300, 100), screen)
+                    screen.blit(fondo_preguntalvl1, (0, 0))
+                    # Mostrar la pregunta (centrada dentro del marco superior)
+                    mostrar_texto_centrado(f'{num1} x {num2} = ?', font_principal, BLACK, pygame.Rect(270, 60, 300, 100), screen)
 
-                    # Volver a mostrar las respuestas y botones
-                    mostrar_texto_centrado(str(respuestas[0]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 - 60, 100, 50), screen)
-                    mostrar_texto_centrado(str(respuestas[1]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 - 60, 100, 50), screen)
-                    mostrar_texto_centrado(str(respuestas[2]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50), screen)
-                    mostrar_texto_centrado(str(respuestas[3]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50), screen)
+                    # Definir posiciones de los botones de respuesta
+                    rect_respuesta_1 = pygame.Rect(220, 188, 100, 50)
+                    rect_respuesta_2 = pygame.Rect(490, 188, 100, 50)
+                    rect_respuesta_3 = pygame.Rect(220, 288, 100, 50)
+                    rect_respuesta_4 = pygame.Rect(490, 288, 100, 50)
+
+                    # Mostrar las respuestas dentro de los botones
+                    mostrar_texto_centrado(str(respuestas[0]), small_font_tabla, BLACK, rect_respuesta_1, screen)
+                    mostrar_texto_centrado(str(respuestas[1]), small_font_tabla, BLACK, rect_respuesta_2, screen)
+                    mostrar_texto_centrado(str(respuestas[2]), small_font_tabla, BLACK, rect_respuesta_3, screen)
+                    mostrar_texto_centrado(str(respuestas[3]), small_font_tabla, BLACK, rect_respuesta_4, screen)
                     
                     # Volver a mostrar los puntos y las vidas totales
-                    mostrar_texto_centrado(f'Puntos: {puntos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 10, 190, 40), screen)
-                    mostrar_texto_centrado(f'Vidas: {vidas}', small_font, BLACK, pygame.Rect(10, 10, 190, 40), screen)
+                    mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(600, 10, 190, 40), screen)
+                    mostrar_texto_centrado(f'Vidas: {vidas}', font_principal, BLACK, pygame.Rect(10, 10, 190, 40), screen)
 
                     # Volver a dibujar botones
                     dibujar_botones(screen)
@@ -231,7 +250,7 @@ def nivel(screen, volver_al_mapa, tabla_seleccionada):
                         if respuesta_voz.isdigit():
                             respuesta_seleccionada = int(respuesta_voz)
                         else:
-                            mostrar_mensaje_con_fondo(screen, 'No se entendió la respuesta.', smaller_font, WHITE, RED, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 150, 300, 50))
+                            mostrar_mensaje_con_fondo(screen, 'No se entendió la respuesta.', smaller_font, WHITE, RED, pygame.Rect(260, 355, 300, 35))
                             pygame.display.update()
                             pygame.time.wait(1000)
                             continue
@@ -241,31 +260,38 @@ def nivel(screen, volver_al_mapa, tabla_seleccionada):
                         if respuesta_seleccionada == resultado_correcto:
                             aciertos += 1  # Sumar un acierto
                             puntos += 2    # Sumar 2 puntos por acierto
-                            mostrar_mensaje_con_fondo(screen, '¡Correcto!', font, WHITE, GREEN, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 150, 300, 50))
+                            mostrar_mensaje_con_fondo(screen, '¡Correcto!', font_mediana, WHITE, GREEN, pygame.Rect(260, 355, 300, 35))
                             pygame.display.update()
 
                             # Esperar 1 segundo y pasar a la siguiente pregunta automáticamente
-                            pygame.time.wait(1000)
+                            pygame.time.wait(3000)
                             resultado_mostrado = True  # Salir del bucle para ir a la siguiente pregunta
                         else:
                             vidas -= 1  # Quitar una vida por intento fallido
-                            mostrar_mensaje_con_fondo(screen, '¡Incorrecto! Inténtalo de nuevo.', smaller_font, WHITE, RED, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 150, 300, 50))
+                            mostrar_mensaje_con_fondo(screen, '¡Incorrecto!', font_mediana, WHITE, RED, pygame.Rect(260, 355, 300, 35))
                             pygame.display.update()
 
                             # Esperar 1 segundo para mostrar el mensaje de incorrecto y luego limpiarlo
-                            pygame.time.wait(1000)
+                            pygame.time.wait(3000)
 
                             # Limpiar la pantalla nuevamente (solo si la respuesta es incorrecta)
-                            screen.blit(fondo_pregunta, (0, 0))
-                            mostrar_texto_centrado(f'{num1} x {num2} = ?', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 6 - 30, 300, 100), screen)
+                            screen.blit(fondo_preguntalvl1, (0, 0))
+                            # Mostrar la pregunta (centrada dentro del marco superior)
+                            mostrar_texto_centrado(f'{num1} x {num2} = ?', font_principal, BLACK, pygame.Rect(270, 60, 300, 100), screen)
 
-                            # Volver a mostrar las respuestas, puntos y vidas
-                            mostrar_texto_centrado(str(respuestas[0]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 - 60, 100, 50), screen)
-                            mostrar_texto_centrado(str(respuestas[1]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 - 60, 100, 50), screen)
-                            mostrar_texto_centrado(str(respuestas[2]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50), screen)
-                            mostrar_texto_centrado(str(respuestas[3]), small_fontTabla, BLACK, pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50), screen)
-                            mostrar_texto_centrado(f'Puntos: {puntos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 10, 190, 40), screen)
-                            mostrar_texto_centrado(f'Vidas: {vidas}', small_font, BLACK, pygame.Rect(10, 10, 190, 40), screen)
+                            # Definir posiciones de los botones de respuesta
+                            rect_respuesta_1 = pygame.Rect(220, 188, 100, 50)
+                            rect_respuesta_2 = pygame.Rect(490, 188, 100, 50)
+                            rect_respuesta_3 = pygame.Rect(220, 288, 100, 50)
+                            rect_respuesta_4 = pygame.Rect(490, 288, 100, 50)
+
+                            # Mostrar las respuestas dentro de los botones
+                            mostrar_texto_centrado(str(respuestas[0]), small_font_tabla, BLACK, rect_respuesta_1, screen)
+                            mostrar_texto_centrado(str(respuestas[1]), small_font_tabla, BLACK, rect_respuesta_2, screen)
+                            mostrar_texto_centrado(str(respuestas[2]), small_font_tabla, BLACK, rect_respuesta_3, screen)
+                            mostrar_texto_centrado(str(respuestas[3]), small_font_tabla, BLACK, rect_respuesta_4, screen)
+                            mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 10, 190, 40), screen)
+                            mostrar_texto_centrado(f'Vidas: {vidas}', font_principal, BLACK, pygame.Rect(10, 10, 190, 40), screen)
 
                             dibujar_botones(screen)
 
@@ -287,10 +313,11 @@ def nivel(screen, volver_al_mapa, tabla_seleccionada):
         preguntas_restantes -= 1
 
     # Mostrar el puntaje final y mensaje de victoria
-    screen.fill(WHITE)
-    mostrar_texto_centrado('¡Felicidades! Has ganado', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 100, 300, 50), screen)
-    mostrar_texto_centrado(f'Aciertos: {aciertos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50, 300, 50), screen)
-    mostrar_texto_centrado(f'Puntos: {puntos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2, 300, 50), screen)
+    video_path = obtener_ruta_recurso('videos/videozzz.mp4')
+    reproducir_video(screen, video_path)
+    mostrar_texto_centrado('¡Felicidades! Has ganado', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 100, 300, 50), screen)
+    mostrar_texto_centrado(f'Aciertos: {aciertos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50, 300, 50), screen)
+    mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2, 300, 50), screen)
     pygame.display.update()
     sonido_victoria.play()  # Reproducir sonido de victoria
     pygame.time.wait(5000)  # Esperar 5 segundos para mostrar el puntaje
@@ -300,9 +327,9 @@ def nivel(screen, volver_al_mapa, tabla_seleccionada):
 # Función para mostrar pantalla de "Game Over" cuando el jugador pierde
 def game_over(screen, puntos, volver_al_mapa):
     screen.fill(WHITE)
-    mostrar_texto_centrado('¡Has perdido!, No te desanimes sigue practicando', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50, 300, 50), screen)
-    mostrar_texto_centrado(f'Total Puntos: {puntos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2, 300, 50), screen)
-    mostrar_texto_centrado('Inténtalo de nuevo', small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 50, 300, 50), screen)
+    mostrar_texto_centrado('¡Has perdido!, sigamos practicando', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50, 300, 50), screen)
+    mostrar_texto_centrado(f'Total Puntos: {puntos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2, 300, 50), screen)
+    mostrar_texto_centrado('Inténtalo de nuevo', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 50, 300, 50), screen)
     pygame.display.update()
     
     # Esperar 5 segundos antes de volver al mapa de tablas
@@ -396,21 +423,21 @@ def nivel_2(screen, volver_al_mapa):
         pregunta, resultado_correcto, respuestas = generar_pregunta_segundo_nivel()
 
         # Rectángulos para la presentación de respuestas
-        rect_pregunta = pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 6 - 30, 300, 100)
+        rect_pregunta = pygame.Rect(270, 40, 300, 100)
         rect_respuestas = [
-            pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 - 60, 100, 50),
-            pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 - 60, 100, 50),
-            pygame.Rect(SCREEN_WIDTH // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50),
-            pygame.Rect(SCREEN_WIDTH * 2 // 3 - 50, SCREEN_HEIGHT // 2 + 40, 100, 50)
+            pygame.Rect(220, 188, 100, 50),
+            pygame.Rect(490, 188, 100, 50),
+            pygame.Rect(220, 288, 100, 50),
+            pygame.Rect(490, 288, 100, 50)
         ]
 
         # Mostrar la pregunta inicial y las respuestas
-        screen.blit(fondo_pregunta, (0, 0))  # Fondo inicial
-        mostrar_texto_centrado(pregunta, font, BLACK, rect_pregunta, screen)
+        screen.blit(fondo_preguntalvl2, (0, 0))  # Fondo inicial
+        mostrar_texto_centrado(pregunta, font_principal, BLACK, rect_pregunta, screen)
         for idx, rect in enumerate(rect_respuestas):
-            mostrar_texto_centrado(str(respuestas[idx]), small_fontTabla, BLACK, rect, screen)
-        mostrar_texto_centrado(f'Puntos: {puntos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 10, 190, 40), screen)
-        mostrar_texto_centrado(f'Vidas: {vidas}', small_font, BLACK, pygame.Rect(10, 10, 190, 40), screen)
+            mostrar_texto_centrado(str(respuestas[idx]), small_font_tabla, BLACK, rect, screen)
+        mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 10, 190, 40), screen)
+        mostrar_texto_centrado(f'Vidas: {vidas}', font_principal, BLACK, pygame.Rect(10, 10, 190, 40), screen)
         dibujar_botones(screen)
         pygame.display.update()  # Actualizar la pantalla inicial
 
@@ -451,14 +478,16 @@ def nivel_2(screen, volver_al_mapa):
 
                     # Detectar botón de entrada de voz
                     if SCREEN_WIDTH // 2 - 80 <= mouse_pos[0] <= SCREEN_WIDTH // 2 + 80 and SCREEN_HEIGHT - 80 <= mouse_pos[1] <= SCREEN_HEIGHT - 30:
-                        respuesta_voz = entrada_de_voz()
+                        sonido_click.play()  # Reproducir sonido de clic
+                        respuesta_voz = entrada_de_voz() # Obtener respuesta por voz
+                        
                         if respuesta_voz.isdigit():
                             respuesta_seleccionada = int(respuesta_voz)
                             ha_respondido = True
                         else:
                             mostrar_mensaje_con_fondo(screen, 'No se entendió la respuesta.', smaller_font, WHITE, RED, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 150, 300, 50))
                             pygame.display.update()
-                            pygame.time.wait(1000)
+                            pygame.time.wait(500)
                             continue
 
                     # Verificar si la respuesta seleccionada es correcta
@@ -470,7 +499,7 @@ def nivel_2(screen, volver_al_mapa):
                             mostrar_correcto = True  # Bandera para mostrar "¡Correcto!"
                             tiempo_inicio_mensaje = pygame.time.get_ticks()
                             # Mostrar mensaje "¡Correcto!" en color verde y centrarlo
-                            mostrar_mensaje_con_fondo(screen, '¡Correcto!', font, WHITE, COLOR_CORRECTO, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 150, 300, 50))
+                            mostrar_mensaje_con_fondo(screen, '¡Correcto!', font_mediana, WHITE, COLOR_CORRECTO, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 150, 300, 50))
                             pygame.display.update()
                             resultado_mostrado = True  # Salir del bucle para la siguiente pregunta
                         else:
@@ -491,12 +520,12 @@ def nivel_2(screen, volver_al_mapa):
                     mensaje_mostrado = False
                     tiempo_inicio_mensaje = None
                     # Limpiar mensaje y mostrar pregunta nuevamente
-                    screen.blit(fondo_pregunta, (0, 0))
-                    mostrar_texto_centrado(pregunta, font, BLACK, rect_pregunta, screen)
+                    screen.blit(fondo_preguntalvl2, (0, 0))
+                    mostrar_texto_centrado(pregunta, font_mediana, BLACK, rect_pregunta, screen)
                     for idx, rect in enumerate(rect_respuestas):
-                        mostrar_texto_centrado(str(respuestas[idx]), small_fontTabla, BLACK, rect, screen)
-                    mostrar_texto_centrado(f'Puntos: {puntos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 10, 190, 40), screen)
-                    mostrar_texto_centrado(f'Vidas: {vidas}', small_font, BLACK, pygame.Rect(10, 10, 190, 40), screen)
+                        mostrar_texto_centrado(str(respuestas[idx]), small_font_tabla, BLACK, rect, screen)
+                    mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 10, 190, 40), screen)
+                    mostrar_texto_centrado(f'Vidas: {vidas}', font_principal, BLACK, pygame.Rect(10, 10, 190, 40), screen)
                     dibujar_botones(screen)
                     pygame.display.update()  # Refrescar la pantalla con la nueva pregunta y opciones
 
@@ -504,25 +533,25 @@ def nivel_2(screen, volver_al_mapa):
 
     # Mostrar el puntaje final y mensaje de victoria
     screen.fill(WHITE)
-    mostrar_texto_centrado('¡Felicidades! Has ganado', font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 100, 300, 50), screen)
-    mostrar_texto_centrado(f'Aciertos: {aciertos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50, 300, 50), screen)
-    mostrar_texto_centrado(f'Puntos: {puntos}', small_font, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2, 300, 50), screen)
+    mostrar_texto_centrado('¡Felicidades! Has ganado', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 100, 300, 50), screen)
+    mostrar_texto_centrado(f'Aciertos: {aciertos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50, 300, 50), screen)
+    mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2, 300, 50), screen)
     pygame.display.update()
     sonido_victoria.play()  # Reproducir sonido de victoria
-    pygame.time.wait(3000)  # Mostrar el puntaje por 3 segundos antes de volver al mapa
+    pygame.time.wait(4000)  # Mostrar el puntaje por 3 segundos antes de volver al mapa
 
     volver_al_mapa()
 
 # Dibujar botones "Siguiente", "Salir" y "Voz"
 def dibujar_botones(screen):
     pygame.draw.rect(screen, BLACK, (SCREEN_WIDTH - 180, SCREEN_HEIGHT - 80, 160, 50))
-    mostrar_texto_centrado('Siguiente', small_font, WHITE, pygame.Rect(SCREEN_WIDTH - 180, SCREEN_HEIGHT - 80, 160, 50), screen)
+    mostrar_texto_centrado('Siguiente', font_mediana, WHITE, pygame.Rect(SCREEN_WIDTH - 180, SCREEN_HEIGHT - 80, 160, 50), screen)
 
     pygame.draw.rect(screen, BLACK, (20, SCREEN_HEIGHT - 80, 160, 50))
-    mostrar_texto_centrado('Salir', small_font, WHITE, pygame.Rect(20, SCREEN_HEIGHT - 80, 160, 50), screen)
+    mostrar_texto_centrado('Salir', font_mediana, WHITE, pygame.Rect(20, SCREEN_HEIGHT - 80, 160, 50), screen)
 
     pygame.draw.rect(screen, BLACK, (SCREEN_WIDTH // 2 - 80, SCREEN_HEIGHT - 80, 160, 50))
-    mostrar_texto_centrado('Voz', small_font, WHITE, pygame.Rect(SCREEN_WIDTH // 2 - 80, SCREEN_HEIGHT - 80, 160, 50), screen)
+    mostrar_texto_centrado('Voz', font_mediana, WHITE, pygame.Rect(SCREEN_WIDTH // 2 - 80, SCREEN_HEIGHT - 80, 160, 50), screen)
 
 # Nivel 1
 def nivel_1(screen, volver_al_mapa):
@@ -530,7 +559,7 @@ def nivel_1(screen, volver_al_mapa):
     if tabla_seleccionada:
         nivel(screen, volver_al_mapa, tabla_seleccionada)
 
-#-------------- Nivel 3 -----------
+#------------------------------------- Nivel 3 --------------------------------------------------
 
 # Definir colores
 COLOR_JUGADOR = (0, 255, 0)  # Verde para la barra de vida del jugador
@@ -543,30 +572,26 @@ COLOR_BOTONES = (255, 255, 255)  # Blanco para los botones de respuesta
 VIDA_JUGADOR = 100
 VIDA_ENEMIGO = 100
 
-# Cargar fuentes
-font = pygame.font.Font(None, 60)  # Tamaño de fuente ajustado para el enunciado
-small_font = pygame.font.Font(None, 50)  # Fuente ajustada para las respuestas
-large_font = pygame.font.Font(None, 80)  # Fuente grande para el texto final
-smaller_font = pygame.font.Font(None, 30)  # Fuente más pequeña para mensajes
 
 # Cargar imágenes del jugador y del enemigo
 imagen_jugador = pygame.image.load(obtener_ruta_recurso('imagenes/jugador.png'))
-imagen_jugador = pygame.transform.scale(imagen_jugador, (100, 100))
-imagen_enemigo = pygame.image.load(obtener_ruta_recurso('imagenes/enemigo.png'))
-imagen_enemigo = pygame.transform.scale(imagen_enemigo, (100, 100))
+imagen_jugador = pygame.transform.scale(imagen_jugador, (150, 150))
+imagen_enemigo = pygame.image.load(obtener_ruta_recurso('imagenes/pirata.png'))
+imagen_enemigo = pygame.transform.scale(imagen_enemigo, (350,150 ))
 
 # Cargar imágenes de los proyectiles (espada y lanza)
 imagen_espada = pygame.image.load(obtener_ruta_recurso('imagenes/espada.png')) # Imagen de la espada del jugador
-imagen_espada = pygame.transform.scale(imagen_espada, (50, 10))  # Redimensionar para proyectil
+imagen_espada = pygame.transform.scale(imagen_espada, (100, 50))  # Redimensionar para proyectil
 
-imagen_lanza = pygame.image.load(obtener_ruta_recurso('imagenes/lanza.png')) # Imagen de la lanza del enemigo
-imagen_lanza = pygame.transform.scale(imagen_lanza, (50, 10)) # Redimensionar para proyectil
+imagen_bala = pygame.image.load(obtener_ruta_recurso('imagenes/bala.png')) # Imagen de la lanza del enemigo
+imagen_bala = pygame.transform.scale(imagen_bala, (100, 30)) # Redimensionar para proyectil
 
 # Cargar sonidos
 sonido_correcto = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/correctoarco.mp3'))
 sonido_incorrecto = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/enemigo_te_pega.mp3'))
 sonido_victoria = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/GANASTE_MED.mp3'))
 sonido_derrota = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/PERDISTE.mp3'))
+sonido_ganalvl3 = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/Felicidades.wav'))
 
 
 
@@ -590,7 +615,7 @@ def generar_pregunta_razonamiento_multiplicacion():
     ("Hay 5 dedos en una mano, ¿cuántos dedos hay en 3 manos?", 15, [14, 15, 16, 17]),
     ("Si cada auto tiene 4 puertas, ¿cuántas puertas hay en 2 autos?", 8, [7, 8, 9, 10]),
     ("Tengo 6 paquetes de stickers con 2 stickers cada uno, ¿cuántos stickers tengo?", 12, [10, 11, 12, 13]),
-    ("Si en cada mesa hay 4 sillas y hay 3 mesas, ¿cuántas sillas hay en total?", 12, [11, 12, 13, 14]),
+    ("Si en cada mesa hay 4 sillas y están 3 mesas, ¿cuántas sillas hay en total?", 12, [11, 12, 13, 14]),
     ("Cada araña tiene 8 patas, ¿cuántas patas tienen 2 arañas?", 16, [15, 16, 17, 18]),
     ("Si una semana tiene 7 días, ¿cuántos días hay en 3 semanas?", 21, [20, 21, 22, 23]),
     ("En un coro hay 5 niños, si hay 4 coros, ¿cuántos niños hay en total?", 20, [18, 19, 20, 21]),
@@ -690,28 +715,35 @@ def generar_pregunta_razonamiento_multiplicacion():
 
 # Dibujar la barra de vida del jugador y del enemigo
 def dibujar_barra_vida(screen, vida_jugador, vida_enemigo):
+    # Dibujar fondo para el texto del Jugador (fondo negro semitransparente)
+    pygame.draw.rect(screen, (50, 50, 50, 200), pygame.Rect(15, 5, 200, 30))  # Fondo semitransparente
+
     # Barra de vida del jugador
-    pygame.draw.rect(screen, COLOR_JUGADOR, (50, 50, vida_jugador * 2, 30))  # Escalar la vida a 200 píxeles
-    mostrar_texto_centrado(f'Jugador: {vida_jugador}%', small_font, COLOR_TEXTO, pygame.Rect(50, 20, 200, 30), screen)
+    pygame.draw.rect(screen, COLOR_JUGADOR, (15, 5, vida_jugador * 2, 30))  # Escalar la vida a 200 píxeles
+    mostrar_texto_centrado(f'Jugador: {vida_jugador}%', small_font, WHITE, pygame.Rect(15, 2, 200, 30), screen)
+
+    # Dibujar fondo para el texto del Enemigo (fondo negro semitransparente)
+    pygame.draw.rect(screen, (50, 50, 50, 150), pygame.Rect(580, 5, 200, 30))  # Fondo semitransparente
 
     # Barra de vida del enemigo
-    pygame.draw.rect(screen, COLOR_ENEMIGO, (550, 50, vida_enemigo * 2, 30))  # Escalar la vida a 200 píxeles
-    mostrar_texto_centrado(f'Enemigo: {vida_enemigo}%', small_font, COLOR_TEXTO, pygame.Rect(550, 20, 200, 30), screen)
+    pygame.draw.rect(screen, COLOR_ENEMIGO, (580, 5, vida_enemigo * 2, 30))  # Escalar la vida a 200 píxeles
+    mostrar_texto_centrado(f'Enemigo: {vida_enemigo}%', small_font, WHITE, pygame.Rect(580, 2, 200, 30), screen)
+
 
 
 # Dibujar botones "Siguiente", "Salir" y "Voz"
 def dibujar_botones(screen):
     # Botón "Siguiente"
     pygame.draw.rect(screen, BLACK, (SCREEN_WIDTH - 180, SCREEN_HEIGHT - 80, 160, 50))
-    mostrar_texto_centrado('Siguiente', small_font, WHITE, pygame.Rect(SCREEN_WIDTH - 180, SCREEN_HEIGHT - 80, 160, 50), screen)
+    mostrar_texto_centrado('Siguiente', font_mediana, WHITE, pygame.Rect(SCREEN_WIDTH - 180, SCREEN_HEIGHT - 80, 160, 50), screen)
 
     # Botón "Salir"
     pygame.draw.rect(screen, BLACK, (20, SCREEN_HEIGHT - 80, 160, 50))
-    mostrar_texto_centrado('Salir', small_font, WHITE, pygame.Rect(20, SCREEN_HEIGHT - 80, 160, 50), screen)
+    mostrar_texto_centrado('Salir', font_mediana, WHITE, pygame.Rect(20, SCREEN_HEIGHT - 80, 160, 50), screen)
 
     # Botón "Voz"
     pygame.draw.rect(screen, BLACK, (SCREEN_WIDTH // 2 - 80, SCREEN_HEIGHT - 80, 160, 50))
-    mostrar_texto_centrado('Voz', small_font, WHITE, pygame.Rect(SCREEN_WIDTH // 2 - 80, SCREEN_HEIGHT - 80, 160, 50), screen)
+    mostrar_texto_centrado('Voz', font_mediana, WHITE, pygame.Rect(SCREEN_WIDTH // 2 - 80, SCREEN_HEIGHT - 80, 160, 50), screen)
 
 # Animación del ataque del jugador y el enemigo
 def animar_ataque(screen, proyectil, inicio_x, inicio_y, final_x, final_y, velocidad=10):
@@ -720,7 +752,10 @@ def animar_ataque(screen, proyectil, inicio_x, inicio_y, final_x, final_y, veloc
         screen.blit(proyectil, (x, y))  # Dibujar el proyectil en la posición actual
         pygame.display.update()
         pygame.time.delay(50)  # Pausa para animación
-        screen.fill(COLOR_FONDO, (x, y, proyectil.get_width(), proyectil.get_height()))  # Limpiar la posición anterior
+        screen.blit(fondo_preguntalvl3, (0, 0))  # Redibujar el fondo
+        dibujar_barra_vida(screen, VIDA_JUGADOR, VIDA_ENEMIGO)  # Redibujar las barras de vida
+        screen.blit(imagen_jugador, (50, SCREEN_HEIGHT - 200))  # Redibujar el jugador
+        screen.blit(imagen_enemigo, (SCREEN_WIDTH - 300, SCREEN_HEIGHT - 200))  # Redibujar el enemigo
         x += velocidad if inicio_x < final_x else -velocidad  # Mover en la dirección correcta
 
 # Función para dividir y centrar el enunciado en varias líneas
@@ -745,6 +780,28 @@ def mostrar_texto_multilinea(texto, fuente, color, rect, screen):
 
         
 
+import cv2  # Importar OpenCV para reproducir videos
+
+# Función para reproducir video
+def reproducir_video(screen, video_path,sonido_ganalvl3):
+    
+    cap = cv2.VideoCapture(video_path)
+    clock = pygame.time.Clock()
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame = cv2.transpose(frame)
+        frame = pygame.surfarray.make_surface(frame)
+        screen.blit(frame, (0, 0))
+        pygame.display.update()
+        clock.tick(30)
+
+    cap.release()
+
 # Función de nivel 3 - Batalla Matemática
 def nivel_3(screen, volver_al_mapa):
     global VIDA_JUGADOR, VIDA_ENEMIGO  # Utilizar las variables globales
@@ -754,40 +811,38 @@ def nivel_3(screen, volver_al_mapa):
     mostrar_explicacion(screen, 3)  # Mostrar explicación del nivel 3
 
     ronda_actual = 1
-    max_rondas = 5
+    max_rondas = 15  # Número máximo de rondas fijo
 
-    # Fondo de pantalla para la batalla
-    fondo_pregunta = pygame.image.load(r'imagenes/nivel3_modified (3).png')
-    fondo_pregunta = pygame.transform.scale(fondo_pregunta, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
 
     while VIDA_JUGADOR > 0 and VIDA_ENEMIGO > 0 and ronda_actual <= max_rondas:
         # Mostrar fondo
-        screen.blit(fondo_pregunta, (0, 0))
+        screen.blit(fondo_preguntalvl3, (0, 0))
 
         # Dibujar barra de vida del jugador y del enemigo
         dibujar_barra_vida(screen, VIDA_JUGADOR, VIDA_ENEMIGO)
 
         # Mostrar imágenes del jugador y del enemigo en la parte inferior
-        screen.blit(imagen_jugador, (50, SCREEN_HEIGHT - 150))  # Jugador en la parte inferior izquierda
-        screen.blit(imagen_enemigo, (SCREEN_WIDTH - 150, SCREEN_HEIGHT - 150))  # Enemigo en la parte inferior derecha
+        screen.blit(imagen_jugador, (50, SCREEN_HEIGHT - 200))  # Jugador en la parte inferior izquierda
+        screen.blit(imagen_enemigo, (SCREEN_WIDTH - 300, SCREEN_HEIGHT - 200))  # Enemigo en la parte inferior derecha
 
         # Generar pregunta y mostrarla
         pregunta, respuesta_correcta, respuestas = generar_pregunta_razonamiento_multiplicacion()
         # Mostrar la pregunta en varias líneas, posicionada más abajo para dejar espacio para la barra de vida
-        mostrar_texto_multilinea(pregunta, font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 350, 100, 700, 150), screen)
+        mostrar_texto_multilinea(pregunta, font_mediana, COLOR_TEXTO, pygame.Rect(80, 50, 650, 150), screen)
 
         # Aleatorizar posiciones de las respuestas
         posiciones_respuestas = [
-            pygame.Rect(100, 250, 100, 50),
-            pygame.Rect(250, 250, 100, 50),
-            pygame.Rect(400, 250, 100, 50),
-            pygame.Rect(550, 250, 100, 50)
+            pygame.Rect(120, 200, 100, 60),
+            pygame.Rect(270, 200, 100, 60),
+            pygame.Rect(420, 200, 100, 60),
+            pygame.Rect(570, 200, 100, 60)
         ]
         random.shuffle(posiciones_respuestas)  # Aleatorizar posiciones
 
         for idx, rect in enumerate(posiciones_respuestas):
             pygame.draw.rect(screen, COLOR_BOTONES, rect)  # Dibujar el fondo del botón
-            mostrar_texto_centrado(str(respuestas[idx]), small_font, COLOR_TEXTO, rect, screen)
+            mostrar_texto_centrado(str(respuestas[idx]), font_principal, COLOR_TEXTO, rect, screen)
 
         pygame.display.update()  # Actualizar pantalla con las respuestas
 
@@ -824,13 +879,31 @@ def nivel_3(screen, volver_al_mapa):
             animar_ataque(screen, imagen_espada, 150, SCREEN_HEIGHT - 100, SCREEN_WIDTH - 150, SCREEN_HEIGHT - 100)
             VIDA_ENEMIGO -= 20
             sonido_correcto.play()  # Reproducir sonido correcto
-            mostrar_mensaje_con_fondo(screen, '¡Correcto! Atacaste al enemigo.', smaller_font, WHITE, GREEN, pygame.Rect(SCREEN_WIDTH // 2 - 200, SCREEN_HEIGHT // 2 + 50, 400, 50))
+            mostrar_mensaje_con_fondo(screen, '¡Correcto! Atacaste al enemigo.', small_font, WHITE, GREEN, pygame.Rect(SCREEN_WIDTH // 2 - 200, SCREEN_HEIGHT // 2 + 50, 400, 50))
+            # Mostrar mensaje "¡Correcto! Atacaste al enemigo." con shake
+            for _ in range(10):  # Realizar el shake 10 veces
+                offset_x = random.randint(-5, 5)
+                offset_y = random.randint(-5, 5)
+                mostrar_mensaje_con_fondo(screen, '¡Correcto! Atacaste al enemigo.', small_font, WHITE, GREEN, pygame.Rect(SCREEN_WIDTH // 2 - 200 + offset_x, SCREEN_HEIGHT // 2 + 50 + offset_y, 400, 50))
+                pygame.display.update()
+                pygame.time.wait(50)  # Pausa breve para el shake
+
+            pygame.time.wait(3000)  # Pausa para mostrar el mensaje
         else:
             # El enemigo ataca al jugador con la lanza hacia la izquierda
-            animar_ataque(screen, imagen_lanza, SCREEN_WIDTH - 150, SCREEN_HEIGHT - 100, 150, SCREEN_HEIGHT - 100)
+            animar_ataque(screen, imagen_bala, SCREEN_WIDTH - 150, SCREEN_HEIGHT - 100, 150, SCREEN_HEIGHT - 100)
             VIDA_JUGADOR -= 20
             sonido_incorrecto.play()  # Reproducir sonido incorrecto
-            mostrar_mensaje_con_fondo(screen, '¡Incorrecto! El enemigo te atacó.', smaller_font, WHITE, RED, pygame.Rect(SCREEN_WIDTH // 2 - 200, SCREEN_HEIGHT // 2 + 50, 400, 50))
+            mostrar_mensaje_con_fondo(screen, '¡Incorrecto! El enemigo te atacó.', small_font, WHITE, RED, pygame.Rect(SCREEN_WIDTH // 2 - 200, SCREEN_HEIGHT // 2 + 50, 400, 50))
+            # Mostrar mensaje "¡Incorrecto! El enemigo te atacó." con shake
+            for _ in range(10):  # Realizar el shake 10 veces
+                offset_x = random.randint(-5, 5)
+                offset_y = random.randint(-5, 5)
+                mostrar_mensaje_con_fondo(screen, '¡Incorrecto! El enemigo te atacó.', small_font, WHITE, RED, pygame.Rect(SCREEN_WIDTH // 2 - 200 + offset_x, SCREEN_HEIGHT // 2 + 50 + offset_y, 400, 50))
+                pygame.display.update()
+                pygame.time.wait(50)  # Pausa breve para el shake
+
+            pygame.time.wait(3000)  # Pausa para mostrar el mensaje
 
         pygame.display.update()
         pygame.time.wait(1000)  # Pausa para mostrar el mensaje
@@ -838,26 +911,25 @@ def nivel_3(screen, volver_al_mapa):
         ronda_actual += 1  # Incrementar la ronda
 
     # Final de la batalla
-    screen.fill(COLOR_FONDO)
+    video_path2 = obtener_ruta_recurso('videos/GANA_LVL3.mp4') if VIDA_ENEMIGO <= 0 else obtener_ruta_recurso('videos/RAFITOCORREA_ELMEJOR.mp4')
+    pygame.mixer.music.load(obtener_ruta_recurso('sonidos/Felicidadeslvl3.wav') if VIDA_ENEMIGO <= 0 else obtener_ruta_recurso('sonidos/PERDISTE.mp3'))
+
+    reproducir_video(screen, video_path2, )
+    pygame.mixer.music.play()
+
     if VIDA_ENEMIGO <= 0:
         sonido_victoria.play()  # Reproducir sonido de victoria
-        mostrar_texto_centrado('¡Felicidades! Has ganado', large_font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 300, SCREEN_HEIGHT // 2 - 50, 600, 100), screen)
+        mostrar_texto_centrado('¡Felicidades! Has ganado', font_principal, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 300, SCREEN_HEIGHT // 2 - 50, 600, 100), screen)
     elif VIDA_JUGADOR <= 0:
         sonido_derrota.play()  # Reproducir sonido de derrota
-        mostrar_texto_centrado('¡Batalla terminada!', large_font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 300, SCREEN_HEIGHT // 2 - 150, 600, 100), screen)
-        mostrar_texto_centrado('¡Perdiste la batalla! :C ', large_font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 300, SCREEN_HEIGHT // 2 - 50, 600, 100), screen)
-        mostrar_texto_centrado('¡Sigue practicando!', large_font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 300, SCREEN_HEIGHT // 2 + 50, 600, 100), screen)
+        mostrar_texto_centrado('¡Batalla terminada!',  font_principal, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 300, SCREEN_HEIGHT // 2 - 150, 600, 100), screen)
+        mostrar_texto_centrado('¡Perdiste la batalla! :C ', font_principal, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 300, SCREEN_HEIGHT // 2 - 50, 600, 100), screen)
+        mostrar_texto_centrado('¡Sigue practicando!', font_principal, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 300, SCREEN_HEIGHT // 2 + 50, 600, 100), screen)
     else:
-        mostrar_texto_centrado('¡Batalla terminada!', large_font, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 300, SCREEN_HEIGHT // 2 - 50, 600, 100), screen)
+        mostrar_texto_centrado('¡Batalla terminada!', font_principal, COLOR_TEXTO, pygame.Rect(SCREEN_WIDTH // 2 - 300, SCREEN_HEIGHT // 2 - 50, 600, 100), screen)
 
     pygame.display.update()
     pygame.time.wait(5000)  # Pausa antes de volver al mapa
 
     volver_al_mapa()  # Volver al mapa de niveles
 
-# Mostrar texto centrado en un rectángulo
-def mostrar_texto_centrado(texto, fuente, color, rect, screen):
-    superficie = fuente.render(texto, True, color)
-    texto_rect = superficie.get_rect()
-    texto_rect.center = (rect.x + rect.width // 2, rect.y + rect.height // 2)
-    screen.blit(superficie, texto_rect)

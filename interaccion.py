@@ -7,7 +7,7 @@ import speech_recognition as sr
 import threading
 from pathlib import Path
 from pygame.locals import *
-from compartido import mostrar_texto_centrado
+from compartido import mostrar_texto_centrado, font_mediana, small_font
 
 import re
 import time
@@ -34,33 +34,10 @@ RED = (200, 0, 0)
 GRAY = (100, 100, 100)
 DARK_GRAY = (50, 50, 50)
 
-# Función para cargar una fuente que soporte emojis
-def cargar_fuente_emoji(tamano):
-    try:
-        if sys.platform == "win32":
-            nombre_fuente = "Segoe UI Emoji"
-        elif sys.platform == "darwin":  # macOS
-            nombre_fuente = "Apple Color Emoji"
-        elif sys.platform == "linux":
-            nombre_fuente = "Noto Color Emoji"
-        else:
-            nombre_fuente = None
 
-        if nombre_fuente:
-            fuente = pygame.font.SysFont(nombre_fuente, tamano)
-        else:
-            fuente = pygame.font.Font(None, tamano)
-    except Exception as e:
-        print(f"Error al cargar la fuente: {e}")
-        fuente = pygame.font.Font(None, tamano)
-    return fuente
-
-# Fuentes
-font = cargar_fuente_emoji(32)
-font_large = cargar_fuente_emoji(30)
 
 # Configurar OpenAI con tu clave de API
-api_key = 'CLAVE OPENAI'  # Reemplaza con tu clave de API
+api_key = 'zzzzz'  # Reemplaza con tu clave de API
 client = OpenAI(api_key=api_key)
 
 # Función para obtener la ruta completa de un recurso
@@ -79,15 +56,18 @@ mostrando_habla_ahora = False
 tiempo_inicio_grabacion = None
 historial_mensajes = [
     {
-        "role": "system",
-        "content": (
-            "Te llamas COREBOT, un robot amigable y divertido diseñado por Holger Centeno bajo la dirección del PhD Orlando Erazo para ayudar a niños de quinto año de educación básica en matemáticas. "
-            "Habla de manera cálida y sencilla, usando palabras que los niños puedan entender fácilmente. "
-            "Utiliza ejemplos prácticos y cotidianos, y si lo deseas, incluye emojis para hacerlo más divertido 🎉. "
-            "Evita usar palabras complicadas o técnicas. "
-            "Si el niño hace una pregunta que no está relacionada con matemáticas de quinto grado, amablemente dile que solo puedes ayudar con ese tema y anímalo a seguir aprendiendo 😊."
-        )
-    }
+    "role": "system",
+    "content": (
+        "Te llamas COREBOT, un robot amigable y diseñado por Holger Centeno bajo la dirección del PhD Orlando Erazo para ayudar a niños de quinto año de educación básica en matemáticas. "
+        "Habla de manera cálida y sencilla, usando palabras que los niños puedan entender fácilmente. "
+        "Utiliza ejemplos prácticos y cotidianos. "
+        "Evita usar palabras complicadas o técnicas y evita el uso de emojis. "
+        "Lee los números de manera clara y precisa. "
+        "Asegúrate de interactuar con el niño preguntando su nombre al inicio de la conversación, y úsalo en tus respuestas para hacer la interacción más personalizada. "
+        "Si el niño hace una pregunta que no está relacionada con matemáticas de quinto grado, amablemente dile que solo puedes ayudar con ese tema y anímalo a seguir aprendiendo. "
+        "Mantén la conversación interactiva, haciendo preguntas para motivar al niño a participar activamente."
+    )
+}
 ]
 
 # Función para renderizar texto en múltiples líneas
@@ -123,7 +103,7 @@ def reproducir_respuesta(texto):
         speech_file_path = Path(__file__).parent / "speech.mp3"
         with client.audio.speech.with_streaming_response.create(
             model="tts-1",
-            voice="alloy",
+            voice="fable",
             input=texto
         ) as response:
             response.stream_to_file(speech_file_path)
@@ -239,22 +219,22 @@ def interaccion():
     clock = pygame.time.Clock()
 
     # Fondo
-    fondo_interaccion = pygame.image.load(obtener_ruta_recurso('imagenes/fondo_interactivo.jpg'))
+    fondo_interaccion = pygame.image.load(obtener_ruta_recurso('imagenes/interaccion_fondo.png'))
     fondo_interaccion = pygame.transform.scale(fondo_interaccion, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
     # Crear botón de "Volver al menú principal"
-    boton_salir_rect = pygame.Rect(10, 20, 200, 50)
+    boton_salir_rect = pygame.Rect(0, 0, 180, 50)
 
     # Crear botones de "Iniciar" y "Detener" grabación
-    boton_iniciar_rect = pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT - 80, 120, 50)
-    boton_detener_rect = pygame.Rect(SCREEN_WIDTH // 2 + 30, SCREEN_HEIGHT - 80, 120, 50)
+    boton_iniciar_rect = pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT - 60, 120, 50)
+    boton_detener_rect = pygame.Rect(SCREEN_WIDTH // 2 + 30, SCREEN_HEIGHT - 60, 120, 50)
 
     while True:
         screen.blit(fondo_interaccion, (0, 0))
 
         # Dibujar botón de "Volver al menú principal"
         pygame.draw.rect(screen, GRAY, boton_salir_rect)
-        texto_boton = font.render("Volver al menú", True, WHITE)
+        texto_boton = small_font.render("Volver al menú", True, WHITE)
         texto_boton_rect = texto_boton.get_rect(center=boton_salir_rect.center)
         screen.blit(texto_boton, texto_boton_rect)
 
@@ -263,32 +243,31 @@ def interaccion():
         color_detener = RED if grabando else DARK_GRAY
 
         pygame.draw.rect(screen, color_iniciar, boton_iniciar_rect)
-        texto_iniciar = font.render("Iniciar", True, WHITE)
+        texto_iniciar = small_font.render("Iniciar", True, WHITE)
         texto_iniciar_rect = texto_iniciar.get_rect(center=boton_iniciar_rect.center)
         screen.blit(texto_iniciar, texto_iniciar_rect)
 
         pygame.draw.rect(screen, color_detener, boton_detener_rect)
-        texto_detener = font.render("Detener", True, WHITE)
+        texto_detener = small_font.render("Detener", True, WHITE)
         texto_detener_rect = texto_detener.get_rect(center=boton_detener_rect.center)
         screen.blit(texto_detener, texto_detener_rect)
 
         # Mostrar texto del usuario y respuesta
-        x_text = 50
-        max_width = SCREEN_WIDTH - x_text - 50  # Margen derecho
+        x_text = 170
+        max_width = SCREEN_WIDTH - x_text - 140  # Margen derecho
 
-        # Mostrar texto del usuario
-        render_text_multiline(f"Tú: {user_text}", x_text, 150, font_large, BLACK, max_width)
+        # Mostrar historial de mensajes
 
         # Mostrar texto del asistente
-        render_text_multiline(f"C.O.R.E.BOT: {response_text}", x_text, 220, font_large, BLACK, max_width)
+        render_text_multiline(f"{response_text}", x_text, 60, font_mediana, BLACK, max_width)
 
         # Mostrar mensaje "¡Habla ahora!" si es necesario
         if mostrando_habla_ahora:
             # Verificar si ha pasado el tiempo para ocultar el mensaje
             tiempo_transcurrido = time.time() - tiempo_inicio_grabacion
-            if tiempo_transcurrido <= 1:  # Mostrar el mensaje solo por 1 segundo
-                habla_surface = font_large.render("¡Habla ahora!", True, GREEN)
-                habla_rect = habla_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+            if tiempo_transcurrido <= 3:  # Mostrar el mensaje solo por 1 segundo
+                habla_surface = font_mediana.render("¡Habla ahora!", True, BLACK)
+                habla_rect = habla_surface.get_rect(bottomright=(SCREEN_WIDTH - 0, SCREEN_HEIGHT - 220))
                 screen.blit(habla_surface, habla_rect)
             else:
                 mostrando_habla_ahora = False  # Ocultar el mensaje después de 1 segundo
@@ -316,8 +295,6 @@ def interaccion():
 
         pygame.display.update()
         clock.tick(30)
-
-    pygame.quit()
 
 if __name__ == "__main__":
     interaccion()

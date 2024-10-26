@@ -2,6 +2,7 @@
 import os
 import pygame
 import sys
+from compartido import font_medium, small_font, font_mediana
 
 # Función para obtener la ruta completa de un recurso (si no está en compartido.py)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -18,16 +19,13 @@ def mostrar_acerca_de(screen):
     BLACK = (0, 0, 0)
     GREY = (50, 50, 50)
 
-    # Fuentes
-    font = pygame.font.SysFont("Comic Sans MS", 36, bold=True)
-    small_font = pygame.font.SysFont("Comic Sans MS", 28)
-
     # Texto que se mostrará
-    titulo = "Acerca de COREBOT"
+    titulo = "Acerca de Corebot"
     descripcion = [
-        "Bienvenido a COREBOT! 🤖✨",
-"COREBOT es un robot educativo amigable y divertido,",
-"Creado para el apoyo en la enseñanza de MATEMÁTICAS",
+        "",
+        "¡Bienvenido a Corebot!",
+"Corebot es un robot educativo amigable y divertido,",
+"creado para el apoyo en la enseñanza de matemáticas.",
 "Para las y los niños pequeños.",
 "Responde preguntas y brinda apoyo didáctico,",
 "con ejemplos prácticos y cotidianos",
@@ -48,17 +46,17 @@ def mostrar_acerca_de(screen):
 
     # Renderizar título con sombra
     shadow_offset = 2
-    titulo_surf_shadow = font.render(titulo, True, GREY)
+    titulo_surf_shadow = font_medium.render(titulo, True, GREY)
     titulo_rect_shadow = titulo_surf_shadow.get_rect(center=(screen.get_width() // 2 + shadow_offset, 100 + shadow_offset))
     screen.blit(titulo_surf_shadow, titulo_rect_shadow)
 
-    titulo_surf = font.render(titulo, True, BLUE)
+    titulo_surf = font_medium.render(titulo, True, BLUE)
     titulo_rect = titulo_surf.get_rect(center=(screen.get_width() // 2, 100))
     screen.blit(titulo_surf, titulo_rect)
 
     # Renderizar descripción con mayor margen en la parte inferior
-    y_offset = 180  # Donde empieza el texto de descripción
-    line_spacing = 35  # Ajustar espacio entre líneas
+    y_offset = 150  # Donde empieza el texto de descripción
+    line_spacing = 28  # Ajustar espacio entre líneas
     for linea in descripcion:
         linea_surf = small_font.render(linea, True, BLACK)
         linea_rect = linea_surf.get_rect(center=(screen.get_width() // 2, y_offset))

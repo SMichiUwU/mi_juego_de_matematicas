@@ -2,10 +2,10 @@ import os
 import pygame
 import sys
 from menu_niveles import mapa_niveles  # Asegúrate de que esta importación y función existan
-from compartido import mostrar_texto_centrado # Importar funciones compartidas
+from compartido import (mostrar_texto_centrado, font_mediana,small_font, font_medium) # Importar funciones compartidas
 from acerca_de import mostrar_acerca_de  # Importar mostrar_acerca_de desde acercade.py
 from interaccion import interaccion  # Importar interaccion desde interaccion.py
-
+        
 # Función para obtener la ruta completa de un recurso
 def obtener_ruta_recurso(ruta_relativa):
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -19,7 +19,7 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 480
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.NOFRAME)  # Sin bordes
 pygame.display.toggle_fullscreen()  # Pantalla completa
-
+    
 pygame.display.set_caption('Menú Principal - Juego Educativo')
 
 # Colores
@@ -30,11 +30,11 @@ BLUE = (0, 0, 255)
 GREEN = (0, 200, 0)
 
 # Cargar imagen de fondo
-fondo_menu = pygame.image.load(obtener_ruta_recurso('imagenes/fondo_menu2.jpg'))
+fondo_menu = pygame.image.load(obtener_ruta_recurso('imagenes/main.png'))
 fondo_menu = pygame.transform.scale(fondo_menu, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Cargar sonidos y música
-pygame.mixer.music.load(obtener_ruta_recurso('sonidos/chiptune-grooving-142242.mp3'))  # Música de fondo
+pygame.mixer.music.load(obtener_ruta_recurso('sonidos/game-music-teste-204327.mp3'))  # Música de fondo
 sonido_click = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/button_09-190435.mp3'))  # Sonido de clic en botones
 
 # Configurar volumen
@@ -44,9 +44,6 @@ sonido_click.set_volume(0.5)
 # Reproducir música de fondo en bucle
 pygame.mixer.music.play(-1)
 
-# Definir fuentes
-font = pygame.font.Font(None, 50)
-small_font = pygame.font.SysFont("Comic Sans MS", 24)  # Define small_font aquí
 
 # Cargar íconos de sonido
 icono_sonido_on = pygame.image.load(obtener_ruta_recurso('imagenes/sonido_on.png'))
@@ -74,6 +71,8 @@ def dibujar_botones(screen):
     pygame.draw.rect(screen, BLACK, boton_voz_rect, border_radius=12)
     mostrar_texto_centrado('Voz', small_font, WHITE, boton_voz_rect, screen)
 
+
+
 # Función para mostrar el menú principal
 def menu_principal():
     global sonido_activado  # Necesario para cambiar el estado del sonido
@@ -83,20 +82,18 @@ def menu_principal():
         screen.blit(fondo_menu, (0, 0))
 
         # Definir botones del menú principal
-        boton_juego = pygame.Rect(250, 120, 300, 70)
-        boton_opcion2 = pygame.Rect(250, 220, 300, 70)
-        boton_acerca = pygame.Rect(250, 320, 300, 70)
+        boton_juego = pygame.Rect(310, 190, 230, 70)
+        boton_opcion2 = pygame.Rect(310, 290, 250, 70)
+        boton_acerca = pygame.Rect(310, 380, 250, 70)
         boton_sonido_rect = pygame.Rect(700, 20, 50, 50)  # Botón de sonido
 
-        # Dibujar los botones con contornos y color negro
-        pygame.draw.rect(screen, BLACK, boton_juego, border_radius=10)
-        pygame.draw.rect(screen, BLACK, boton_opcion2, border_radius=10)
-        pygame.draw.rect(screen, BLACK, boton_acerca, border_radius=10)
+        # Dibujar los botones sin contornos ni color de fondo (transparentes)
+        # No se dibuja el rectángulo, solo se muestra el texto
 
-        # Mostrar texto en cada botón con fondo negro y texto blanco
-        mostrar_texto_centrado('Iniciar Juego', font, WHITE, boton_juego, screen)
-        mostrar_texto_centrado('Interacción', font, WHITE, boton_opcion2, screen)
-        mostrar_texto_centrado('Acerca de', font, WHITE, boton_acerca, screen)
+        # Mostrar texto en cada botón con fondo transparente y texto blanco
+        mostrar_texto_centrado('Play', font_mediana, WHITE, boton_juego, screen)
+        mostrar_texto_centrado('Charla', font_mediana, WHITE, boton_opcion2, screen)
+        mostrar_texto_centrado('Acerca de', font_medium, WHITE, boton_acerca, screen)
 
         # Dibujar el icono de sonido según el estado actual
         if sonido_activado:
