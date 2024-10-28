@@ -1,6 +1,8 @@
 import os
 import pygame
 import sys
+import cv2
+import pygame
 from niveles import nivel_1, nivel_2, nivel_3  # Importar los niveles
 from compartido import obtener_ruta_recurso, font_mediana  # Importar funciones compartidas
 
@@ -69,9 +71,38 @@ def mostrar_numero(numero, fuente, color, x, y):
     rect.center = (x, y)
     screen.blit(superficie, rect)
 
+# Función para reproducir video
+def reproducir_video(screen, video_path, sonido_path=None):
+    cap = cv2.VideoCapture(video_path)
+    clock = pygame.time.Clock()
+
+    if sonido_path:
+        pygame.mixer.music.load(sonido_path)
+        pygame.mixer.music.play()
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame = cv2.transpose(frame)
+        frame = pygame.surfarray.make_surface(frame)
+        screen.blit(frame, (0, 0))
+        pygame.display.update()
+        clock.tick(30)
+
+    cap.release()
+    if sonido_path:
+        pygame.mixer.music.stop()
+
 # Función para el mapa de selección de niveles
 def mapa_niveles():
     global musica_activada  # Usar las variables globales para gestionar el estado
+    video_pathBienvenida = obtener_ruta_recurso('videos/Bienvenida_Instr_vid.mp4')
+    pygame.mixer.music.load(obtener_ruta_recurso('sonidos/Bienvenidad_instruccion.wav'))
+    pygame.mixer.music.play()
+    reproducir_video(screen, video_pathBienvenida)
 
     while True:
         screen.blit(mapa_fondo, (0, 0))  # Dibujar fondo del mapa

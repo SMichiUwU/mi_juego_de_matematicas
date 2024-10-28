@@ -4,6 +4,11 @@ import pygame
 import sys
 from compartido import font_medium, small_font, font_mediana
 
+
+# Configuración de pantalla
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 480
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 # Función para obtener la ruta completa de un recurso (si no está en compartido.py)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -18,6 +23,10 @@ def mostrar_acerca_de(screen):
     LIGHT_BLUE = (135, 206, 250)  # Azul claro para hover en el botón
     BLACK = (0, 0, 0)
     GREY = (50, 50, 50)
+
+    fondo_interaccion = pygame.image.load(obtener_ruta_recurso('imagenes/Acercade.png'))
+    fondo_interaccion = pygame.transform.scale(fondo_interaccion, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
 
     # Texto que se mostrará
     titulo = "Acerca de Corebot"

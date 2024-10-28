@@ -7,7 +7,7 @@ import speech_recognition as sr
 import threading
 from pathlib import Path
 from pygame.locals import *
-from compartido import mostrar_texto_centrado, font_mediana, small_font
+from compartido import mostrar_texto_centrado, font_mediana, small_font, font_medium
 
 import re
 import time
@@ -37,7 +37,7 @@ DARK_GRAY = (50, 50, 50)
 
 
 # Configurar OpenAI con tu clave de API
-api_key = 'zzzzz'  # Reemplaza con tu clave de API
+api_key = 'zzz'  # Reemplaza con tu clave de API
 client = OpenAI(api_key=api_key)
 
 # Función para obtener la ruta completa de un recurso
@@ -62,10 +62,16 @@ historial_mensajes = [
         "Habla de manera cálida y sencilla, usando palabras que los niños puedan entender fácilmente. "
         "Utiliza ejemplos prácticos y cotidianos. "
         "Evita usar palabras complicadas o técnicas y evita el uso de emojis. "
-        "Lee los números de manera clara y precisa. "
+        "Lee los números de manera clara y precisa."
+        "Tus respuestas deben ser cortas, cuando quieren hablar de tablas de multiplicar, no debes mostrar en una lista si no de forma corrida. "
         "Asegúrate de interactuar con el niño preguntando su nombre al inicio de la conversación, y úsalo en tus respuestas para hacer la interacción más personalizada. "
         "Si el niño hace una pregunta que no está relacionada con matemáticas de quinto grado, amablemente dile que solo puedes ayudar con ese tema y anímalo a seguir aprendiendo. "
         "Mantén la conversación interactiva, haciendo preguntas para motivar al niño a participar activamente."
+        "Si no sabes la respuesta a una pregunta, puedes decir algo como: 'Esa es una pregunta interesante, déjame investigar un poco más y te respondo en un momento'."
+        "Solo responde de manera corta y precisa, evitando respuestas muy largas o complicadas. "
+        "Siempre mantén un tono amigable y positivo en tus respuestas. "
+        "Si el niño te hace una pregunta inapropiada o que no puedes responder, puedes decir algo como: 'Esa es una pregunta interesante, pero no puedo responderla. ¿Tienes alguna otra pregunta sobre matemáticas?'"
+        "Si el niño te hace una pregunta que no entiendes, puedes decir algo como: 'No entendí tu pregunta, ¿puedes repetirla de otra manera?'"
     )
 }
 ]
@@ -148,7 +154,7 @@ def reproducir_respuesta(texto):
 def obtener_respuesta_ia(historial_mensajes):
     try:
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=historial_mensajes,
             temperature=0.7,
             max_tokens=300,
@@ -219,11 +225,11 @@ def interaccion():
     clock = pygame.time.Clock()
 
     # Fondo
-    fondo_interaccion = pygame.image.load(obtener_ruta_recurso('imagenes/interaccion_fondo.png'))
+    fondo_interaccion = pygame.image.load(obtener_ruta_recurso('imagenes/Interaccion.png'))
     fondo_interaccion = pygame.transform.scale(fondo_interaccion, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
     # Crear botón de "Volver al menú principal"
-    boton_salir_rect = pygame.Rect(0, 0, 180, 50)
+    boton_salir_rect = pygame.Rect(2, 2, 150, 50)
 
     # Crear botones de "Iniciar" y "Detener" grabación
     boton_iniciar_rect = pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT - 60, 120, 50)
@@ -253,13 +259,13 @@ def interaccion():
         screen.blit(texto_detener, texto_detener_rect)
 
         # Mostrar texto del usuario y respuesta
-        x_text = 170
-        max_width = SCREEN_WIDTH - x_text - 140  # Margen derecho
+        x_text = 80
+        max_width = SCREEN_WIDTH - x_text - 70  # Margen derecho
 
         # Mostrar historial de mensajes
 
         # Mostrar texto del asistente
-        render_text_multiline(f"{response_text}", x_text, 60, font_mediana, BLACK, max_width)
+        render_text_multiline(f"{response_text}", x_text, 100, font_medium, BLACK, max_width)
 
         # Mostrar mensaje "¡Habla ahora!" si es necesario
         if mostrando_habla_ahora:

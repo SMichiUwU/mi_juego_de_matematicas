@@ -158,6 +158,17 @@ def mostrar_mensaje_con_fondo(screen, mensaje, small_font, color_texto, color_fo
 
 
 #-----------------NIVEL 1-----------------------
+# Nivel 1
+def nivel_1(screen, volver_al_mapa):
+    video_pathIntroLvl1 = obtener_ruta_recurso('videos/IntroLvl1.mp4')
+    pygame.mixer.music.load(obtener_ruta_recurso('sonidos/Lvl1_instruccion.wav'))
+    pygame.mixer.music.play()
+    reproducir_video(screen, video_pathIntroLvl1)
+    tabla_seleccionada = menu_tabla_multiplicar(screen, volver_al_mapa)
+    if tabla_seleccionada:
+        nivel(screen, volver_al_mapa, tabla_seleccionada)
+
+
 # Función de nivel con tabla seleccionada
 def nivel(screen, volver_al_mapa, tabla_seleccionada):
     mostrar_explicacion(screen, 1)  # Mostrar explicación del nivel 1
@@ -228,8 +239,8 @@ def nivel(screen, volver_al_mapa, tabla_seleccionada):
                     mostrar_texto_centrado(str(respuestas[3]), small_font_tabla, BLACK, rect_respuesta_4, screen)
                     
                     # Volver a mostrar los puntos y las vidas totales
-                    mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(600, 10, 190, 40), screen)
-                    mostrar_texto_centrado(f'Vidas: {vidas}', font_principal, BLACK, pygame.Rect(10, 10, 190, 40), screen)
+                    mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(600, 50, 190, 40), screen)
+                    mostrar_texto_centrado(f'Vidas: {vidas}', font_principal, BLACK, pygame.Rect(10, 80, 190, 40), screen)
 
                     # Volver a dibujar botones
                     dibujar_botones(screen)
@@ -406,6 +417,10 @@ def generar_pregunta_segundo_nivel():
 
 # Función del segundo nivel
 def nivel_2(screen, volver_al_mapa):
+    video_pathIntroLvl2 = obtener_ruta_recurso('videos/IntroLvl2.mp4')
+    pygame.mixer.music.load(obtener_ruta_recurso('sonidos/Lvl2_instruccion.wav'))
+    pygame.mixer.music.play()
+    reproducir_video(screen, video_pathIntroLvl2)
     mostrar_explicacion(screen, 2)  # Mostrar explicación del nivel 2
 
     preguntas_restantes = 12
@@ -423,7 +438,7 @@ def nivel_2(screen, volver_al_mapa):
         pregunta, resultado_correcto, respuestas = generar_pregunta_segundo_nivel()
 
         # Rectángulos para la presentación de respuestas
-        rect_pregunta = pygame.Rect(270, 40, 300, 100)
+        rect_pregunta = pygame.Rect(260, 55, 300, 100)
         rect_respuestas = [
             pygame.Rect(220, 188, 100, 50),
             pygame.Rect(490, 188, 100, 50),
@@ -436,8 +451,8 @@ def nivel_2(screen, volver_al_mapa):
         mostrar_texto_centrado(pregunta, font_principal, BLACK, rect_pregunta, screen)
         for idx, rect in enumerate(rect_respuestas):
             mostrar_texto_centrado(str(respuestas[idx]), small_font_tabla, BLACK, rect, screen)
-        mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 10, 190, 40), screen)
-        mostrar_texto_centrado(f'Vidas: {vidas}', font_principal, BLACK, pygame.Rect(10, 10, 190, 40), screen)
+        mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH - 180, 30, 190, 40), screen)
+        mostrar_texto_centrado(f'Vidas: {vidas}', font_principal, BLACK, pygame.Rect(2, 40, 190, 40), screen)
         dibujar_botones(screen)
         pygame.display.update()  # Actualizar la pantalla inicial
 
@@ -553,11 +568,7 @@ def dibujar_botones(screen):
     pygame.draw.rect(screen, BLACK, (SCREEN_WIDTH // 2 - 80, SCREEN_HEIGHT - 80, 160, 50))
     mostrar_texto_centrado('Voz', font_mediana, WHITE, pygame.Rect(SCREEN_WIDTH // 2 - 80, SCREEN_HEIGHT - 80, 160, 50), screen)
 
-# Nivel 1
-def nivel_1(screen, volver_al_mapa):
-    tabla_seleccionada = menu_tabla_multiplicar(screen, volver_al_mapa)
-    if tabla_seleccionada:
-        nivel(screen, volver_al_mapa, tabla_seleccionada)
+
 
 #------------------------------------- Nivel 3 --------------------------------------------------
 
@@ -591,7 +602,7 @@ sonido_correcto = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/correctoarco.
 sonido_incorrecto = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/enemigo_te_pega.mp3'))
 sonido_victoria = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/GANASTE_MED.mp3'))
 sonido_derrota = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/PERDISTE.mp3'))
-sonido_ganalvl3 = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/Felicidades.wav'))
+sonido_ganalvl3 = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/Felicidadeslvl3.wav'))
 
 
 
@@ -600,106 +611,107 @@ sonido_ganalvl3 = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/Felicidades.w
 def generar_pregunta_razonamiento_multiplicacion():
     # Listas de preguntas clasificadas
     preguntas_faciles = [
-    ("Si compro 2 manzanas a $3 cada una, ¿cuánto gasto en total?", 6, [4, 5, 6, 7]),
-    ("Si hay 5 días en una semana laboral, ¿cuántos días hay en 2 semanas laborales?", 10, [8, 10, 12, 14]),
-    ("Tengo 3 cajas con 2 lápices cada una, ¿cuántos lápices tengo en total?", 6, [5, 6, 7, 8]),
-    ("Si un gato tiene 4 patas, ¿cuántas patas tienen 2 gatos?", 8, [6, 7, 8, 9]),
-    ("Ana tiene 5 flores y María tiene 3 flores, ¿cuántas flores tienen en total?", 8, [7, 8, 9, 10]),
-    ("Si un carrito tiene 4 ruedas, ¿cuántas ruedas tienen 3 carritos?", 12, [10, 11, 12, 13]),
-    ("Hay 2 pájaros en cada árbol y hay 5 árboles, ¿cuántos pájaros hay en total?", 10, [8, 9, 10, 11]),
-    ("Si cada semana tengo 7 días, ¿cuántos días hay en 2 semanas?", 14, [12, 13, 14, 15]),
-    ("Tengo 4 bolsas con 3 canicas cada una, ¿cuántas canicas tengo en total?", 12, [11, 12, 13, 14]),
-    ("Si un pulpo tiene 8 tentáculos, ¿cuántos tentáculos tienen 2 pulpos?", 16, [14, 15, 16, 17]),
-    ("Pedro tiene 3 paquetes de galletas con 5 galletas cada uno, ¿cuántas galletas tiene en total?", 15, [13, 14, 15, 16]),
-    ("Si una bicicleta tiene 2 ruedas, ¿cuántas ruedas tienen 4 bicicletas?", 8, [6, 7, 8, 9]),
-    ("Hay 5 dedos en una mano, ¿cuántos dedos hay en 3 manos?", 15, [14, 15, 16, 17]),
-    ("Si cada auto tiene 4 puertas, ¿cuántas puertas hay en 2 autos?", 8, [7, 8, 9, 10]),
-    ("Tengo 6 paquetes de stickers con 2 stickers cada uno, ¿cuántos stickers tengo?", 12, [10, 11, 12, 13]),
-    ("Si en cada mesa hay 4 sillas y están 3 mesas, ¿cuántas sillas hay en total?", 12, [11, 12, 13, 14]),
-    ("Cada araña tiene 8 patas, ¿cuántas patas tienen 2 arañas?", 16, [15, 16, 17, 18]),
-    ("Si una semana tiene 7 días, ¿cuántos días hay en 3 semanas?", 21, [20, 21, 22, 23]),
-    ("En un coro hay 5 niños, si hay 4 coros, ¿cuántos niños hay en total?", 20, [18, 19, 20, 21]),
-    ("Si cada paquete tiene 10 caramelos y compro 2 paquetes, ¿cuántos caramelos tengo?", 20, [18, 19, 20, 21]),
-    ("Hay 2 ojos en una cara, ¿cuántos ojos hay en 6 caras?", 12, [11, 12, 13, 14]),
-    ("Si cada día como 1 manzana, ¿cuántas manzanas como en 7 días?", 7, [6, 7, 8, 9]),
-    ("Tengo 5 libros y cada libro tiene 2 marcadores, ¿cuántos marcadores tengo?", 10, [8, 9, 10, 11]),
-    ("Si una hora tiene 60 minutos, ¿cuántos minutos hay en 2 horas?", 120, [110, 115, 120, 125]),
-    ("En un jardín hay 3 filas de 4 flores, ¿cuántas flores hay en total?", 12, [10, 11, 12, 13]),
-    ("Si cada niño tiene 2 globos y hay 5 niños, ¿cuántos globos hay en total?", 10, [9, 10, 11, 12]),
-    ("Tengo 4 cajas y en cada una hay 3 pelotas, ¿cuántas pelotas tengo?", 12, [11, 12, 13, 14]),
-    ("Si cada camiseta cuesta $5 y compro 3 camisetas, ¿cuánto pago?", 15, [12, 13, 14, 15]),
-    ("Hay 6 huevos en una caja, ¿cuántos huevos hay en 2 cajas?", 12, [10, 11, 12, 13]),
-    ("Si una docena son 12 unidades, ¿cuántas unidades hay en 1 docena?", 12, [11, 12, 13, 14]),
-    ("En una jaula hay 2 conejos, ¿cuántas patas tienen en total?", 8, [6, 7, 8, 9])
-    ]
+    ("Compro 2 manzanas. Cada una cuesta $3. ¿Cuánto dinero gasto en total?", 6, [4, 5, 6, 7]),
+    ("Una semana laboral tiene 5 días. ¿Cuántos días laborales hay en 2 semanas?", 10, [8, 10, 12, 14]),
+    ("En cada caja hay 2 lápices. Si tengo 3 cajas, ¿cuántos lápices tengo en total?", 6, [5, 6, 7, 8]),
+    ("Cada gato tiene 4 patas. Si hay 2 gatos, ¿cuántas patas tienen entre los dos?", 8, [6, 7, 8, 9]),
+    ("Ana tiene 5 flores y María tiene 3. ¿Cuántas flores tienen entre las dos?", 8, [7, 8, 9, 10]),
+    ("Cada carrito tiene 4 ruedas. ¿Cuántas ruedas tienen 3 carritos?", 12, [10, 11, 12, 13]),
+    ("En cada árbol hay 2 pájaros. Si hay 5 árboles, ¿cuántos pájaros hay en total?", 10, [8, 9, 10, 11]),
+    ("Una semana tiene 7 días. ¿Cuántos días hay en 2 semanas?", 14, [12, 13, 14, 15]),
+    ("En cada bolsa hay 3 canicas. Si tengo 4 bolsas, ¿cuántas canicas tengo en total?", 12, [11, 12, 13, 14]),
+    ("Cada pulpo tiene 8 tentáculos. Si hay 2 pulpos, ¿cuántos tentáculos hay en total?", 16, [14, 15, 16, 17]),
+    ("Pedro tiene 3 paquetes de galletas. Cada paquete tiene 5 galletas. ¿Cuántas galletas tiene en total?", 15, [13, 14, 15, 16]),
+    ("Cada bicicleta tiene 2 ruedas. Si hay 4 bicicletas, ¿cuántas ruedas hay en total?", 8, [6, 7, 8, 9]),
+    ("En una mano hay 5 dedos. Si tengo 3 manos, ¿cuántos dedos hay en total?", 15, [14, 15, 16, 17]),
+    ("Cada auto tiene 4 puertas. Si hay 2 autos, ¿cuántas puertas hay en total?", 8, [7, 8, 9, 10]),
+    ("Tengo 6 paquetes de stickers. Cada paquete tiene 2 stickers. ¿Cuántos stickers tengo en total?", 12, [10, 11, 12, 13]),
+    ("En cada mesa hay 4 sillas. Si hay 3 mesas, ¿cuántas sillas hay en total?", 12, [11, 12, 13, 14]),
+    ("Cada araña tiene 8 patas. Si hay 2 arañas, ¿cuántas patas tienen en total?", 16, [15, 16, 17, 18]),
+    ("Una semana tiene 7 días. ¿Cuántos días hay en 3 semanas?", 21, [20, 21, 22, 23]),
+    ("En un coro hay 5 niños. Si hay 4 coros, ¿cuántos niños hay en total?", 20, [18, 19, 20, 21]),
+    ("Cada paquete tiene 10 caramelos. Si compro 2 paquetes, ¿cuántos caramelos tengo en total?", 20, [18, 19, 20, 21]),
+    ("Cada cara tiene 2 ojos. Si hay 6 caras, ¿cuántos ojos hay en total?", 12, [11, 12, 13, 14]),
+    ("Si como una manzana al día, ¿cuántas manzanas como en 7 días?", 7, [6, 7, 8, 9]),
+    ("Tengo 5 libros. Cada libro tiene 2 marcadores. ¿Cuántos marcadores tengo en total?", 10, [8, 9, 10, 11]),
+    ("Una hora tiene 60 minutos. ¿Cuántos minutos hay en 2 horas?", 120, [110, 115, 120, 125]),
+    ("En un jardín hay 3 filas de 4 flores. ¿Cuántas flores hay en total?", 12, [10, 11, 12, 13]),
+    ("Cada niño tiene 2 globos. Si hay 5 niños, ¿cuántos globos hay en total?", 10, [9, 10, 11, 12]),
+    ("Tengo 4 cajas y cada una tiene 3 pelotas. ¿Cuántas pelotas tengo en total?", 12, [11, 12, 13, 14]),
+    ("Cada camiseta cuesta $5. Si compro 3 camisetas, ¿cuánto dinero pago?", 15, [12, 13, 14, 15]),
+    ("En una caja hay 6 huevos. Si tengo 2 cajas, ¿cuántos huevos tengo en total?", 12, [10, 11, 12, 13]),
+    ("Una docena tiene 12 unidades. ¿Cuántas unidades hay en 1 docena?", 12, [11, 12, 13, 14]),
+    ("En una jaula hay 2 conejos. ¿Cuántas patas tienen en total?", 8, [6, 7, 8, 9])
+]
 
     preguntas_intermedias = [
-    ("Si un trabajador gana $15 por hora y trabaja 8 horas al día, ¿cuánto gana en un día?", 120, [110, 115, 120, 125]),
-    ("En una granja hay 12 gallinas y cada una pone 5 huevos, ¿cuántos huevos hay en total?", 60, [50, 55, 60, 65]),
-    ("Si un autobús puede llevar 40 pasajeros, ¿cuántos pasajeros pueden viajar en 3 autobuses?", 120, [110, 115, 120, 125]),
-    ("Tengo 9 paquetes de 6 caramelos cada uno, ¿cuántos caramelos tengo en total?", 54, [50, 52, 54, 56]),
-    ("Si cada caja contiene 25 lápices y tengo 4 cajas, ¿cuántos lápices tengo?", 100, [90, 95, 100, 105]),
-    ("Un árbol frutal produce 30 manzanas al día, ¿cuántas manzanas produce en 5 días?", 150, [140, 145, 150, 155]),
-    ("Si cada persona necesita 2 metros de tela y hay 20 personas, ¿cuánta tela se necesita?", 40, [38, 39, 40, 41]),
-    ("En una biblioteca hay 8 estantes con 15 libros cada uno, ¿cuántos libros hay en total?", 120, [110, 115, 120, 125]),
-    ("Si un coche consume 7 litros de gasolina cada 100 km, ¿cuántos litros necesita para 300 km?", 21, [18, 20, 21, 22]),
-    ("Tengo 5 bolsas y en cada una hay 18 naranjas, ¿cuántas naranjas tengo en total?", 90, [85, 88, 90, 92]),
-    ("Si una clase dura 45 minutos, ¿cuántos minutos hay en 6 clases?", 270, [260, 265, 270, 275]),
-    ("En un torneo hay 16 equipos y cada equipo juega 3 partidos, ¿cuántos partidos se juegan en total?", 48, [45, 46, 48, 50]),
-    ("Si un tren tiene 8 vagones y cada vagón puede llevar 50 pasajeros, ¿cuántos pasajeros en total?", 400, [380, 390, 400, 410]),
-    ("Una fábrica produce 200 botellas al día, ¿cuántas botellas produce en una semana de 7 días?", 1400, [1350, 1380, 1400, 1420]),
-    ("Si una máquina puede hacer 30 piezas por hora, ¿cuántas piezas hace en un turno de 8 horas?", 240, [230, 235, 240, 245]),
-    ("Tengo 12 cajas con 12 chocolates cada una, ¿cuántos chocolates tengo en total?", 144, [140, 142, 144, 146]),
-    ("Si un ciclista recorre 25 km al día, ¿cuántos kilómetros recorrerá en 5 días?", 125, [120, 123, 125, 128]),
-    ("En un teatro hay 20 filas con 15 asientos cada una, ¿cuántos asientos hay en total?", 300, [290, 295, 300, 305]),
-    ("Si un libro tiene 250 páginas y leo 10 páginas al día, ¿en cuántos días lo termino?", 25, [23, 24, 25, 26]),
-    ("Una piscina se llena con 50 litros de agua por minuto, ¿cuántos litros en 30 minutos?", 1500, [1450, 1475, 1500, 1525]),
-    ("Si una granja tiene 15 vacas y cada una da 8 litros de leche al día, ¿cuántos litros en total?", 120, [115, 118, 120, 123]),
-    ("Un paquete de galletas cuesta $2 y compro 20 paquetes, ¿cuánto gasto en total?", 40, [35, 38, 40, 42]),
-    ("Si hay 24 horas en un día, ¿cuántas horas hay en 3 días?", 72, [68, 70, 72, 74]),
-    ("Tengo 7 camisas y cada una tiene 8 botones, ¿cuántos botones en total?", 56, [54, 55, 56, 57]),
-    ("Si un aula tiene 5 filas de 6 pupitres, ¿cuántos pupitres hay en total?", 30, [28, 29, 30, 31]),
-    ("En una feria hay 10 juegos y cada juego cuesta 3 tickets, ¿cuántos tickets necesito para jugar todos?", 30, [28, 29, 30, 31]),
-    ("Si una botella contiene 1.5 litros y tengo 12 botellas, ¿cuántos litros tengo en total?", 18, [16, 17, 18, 19]),
-    ("Un restaurante tiene 12 mesas y en cada mesa caben 4 personas, ¿cuántas personas en total?", 48, [45, 46, 48, 50]),
-    ("Si un corredor da 4 vueltas en una pista de 400 metros, ¿cuántos metros corre en total?", 1600, [1500, 1550, 1600, 1650]),
-    ("Tengo 9 cajas de huevos y cada caja tiene 12 huevos, ¿cuántos huevos tengo?", 108, [104, 106, 108, 110]),
-    ("Si un mes tiene 30 días, ¿cuántos días hay en 6 meses?", 180, [175, 178, 180, 183])
-    ]
+    ("Un trabajador gana $15 por cada hora. Si trabaja 8 horas en un día, ¿cuánto gana en total?", 120, [110, 115, 120, 125]),
+    ("En una granja hay 12 gallinas. Cada gallina pone 5 huevos. ¿Cuántos huevos hay en total?", 60, [50, 55, 60, 65]),
+    ("Un autobús puede llevar 40 pasajeros. Si hay 3 autobuses, ¿cuántos pasajeros pueden viajar en total?", 120, [110, 115, 120, 125]),
+    ("Cada paquete tiene 6 caramelos. Si tengo 9 paquetes, ¿cuántos caramelos tengo en total?", 54, [50, 52, 54, 56]),
+    ("Cada caja tiene 25 lápices. Si tengo 4 cajas, ¿cuántos lápices tengo en total?", 100, [90, 95, 100, 105]),
+    ("Un árbol produce 30 manzanas al día. ¿Cuántas manzanas produce en 5 días?", 150, [140, 145, 150, 155]),
+    ("Cada persona necesita 2 metros de tela. Si hay 20 personas, ¿cuánta tela se necesita en total?", 40, [38, 39, 40, 41]),
+    ("En una biblioteca hay 8 estantes. Cada estante tiene 15 libros. ¿Cuántos libros hay en total?", 120, [110, 115, 120, 125]),
+    ("Un coche usa 7 litros de gasolina por cada 100 km. Si recorre 300 km, ¿cuántos litros de gasolina necesita en total?", 21, [18, 20, 21, 22]),
+    ("Cada bolsa tiene 18 naranjas. Si tengo 5 bolsas, ¿cuántas naranjas tengo en total?", 90, [85, 88, 90, 92]),
+    ("Una clase dura 45 minutos. Si tengo 6 clases, ¿cuántos minutos en total?", 270, [260, 265, 270, 275]),
+    ("En un torneo hay 16 equipos. Cada equipo juega 3 partidos. ¿Cuántos partidos se juegan en total?", 48, [45, 46, 48, 50]),
+    ("Un tren tiene 8 vagones. Cada vagón puede llevar 50 pasajeros. ¿Cuántos pasajeros puede llevar en total?", 400, [380, 390, 400, 410]),
+    ("Una fábrica produce 200 botellas cada día. ¿Cuántas botellas produce en una semana de 7 días?", 1400, [1350, 1380, 1400, 1420]),
+    ("Una máquina puede hacer 30 piezas por hora. Si trabaja 8 horas, ¿cuántas piezas hace en total?", 240, [230, 235, 240, 245]),
+    ("Tengo 12 cajas y cada una tiene 12 chocolates. ¿Cuántos chocolates tengo en total?", 144, [140, 142, 144, 146]),
+    ("Un ciclista recorre 25 km cada día. ¿Cuántos kilómetros recorrerá en 5 días?", 125, [120, 123, 125, 128]),
+    ("En un teatro hay 20 filas. Cada fila tiene 15 asientos. ¿Cuántos asientos hay en total?", 300, [290, 295, 300, 305]),
+    ("Un libro tiene 250 páginas. Si leo 10 páginas al día, ¿en cuántos días termino el libro?", 25, [23, 24, 25, 26]),
+    ("Una piscina se llena con 50 litros de agua por minuto. ¿Cuántos litros se llenan en 30 minutos?", 1500, [1450, 1475, 1500, 1525]),
+    ("En una granja hay 15 vacas. Cada vaca da 8 litros de leche al día. ¿Cuántos litros en total?", 120, [115, 118, 120, 123]),
+    ("Cada paquete de galletas cuesta $2. Si compro 20 paquetes, ¿cuánto dinero gasto en total?", 40, [35, 38, 40, 42]),
+    ("Un día tiene 24 horas. ¿Cuántas horas hay en 3 días?", 72, [68, 70, 72, 74]),
+    ("Cada camisa tiene 8 botones. Si tengo 7 camisas, ¿cuántos botones tengo en total?", 56, [54, 55, 56, 57]),
+    ("En un aula hay 5 filas de 6 pupitres. ¿Cuántos pupitres hay en total?", 30, [28, 29, 30, 31]),
+    ("En una feria hay 10 juegos. Cada juego cuesta 3 tickets. ¿Cuántos tickets necesito para jugar en todos los juegos?", 30, [28, 29, 30, 31]),
+    ("Cada botella tiene 1.5 litros. Si tengo 12 botellas, ¿cuántos litros tengo en total?", 18, [16, 17, 18, 19]),
+    ("Un restaurante tiene 12 mesas. Cada mesa tiene 4 asientos. ¿Cuántas personas caben en total?", 48, [45, 46, 48, 50]),
+    ("Un corredor da 4 vueltas en una pista de 400 metros. ¿Cuántos metros corre en total?", 1600, [1500, 1550, 1600, 1650]),
+    ("Tengo 9 cajas de huevos. Cada caja tiene 12 huevos. ¿Cuántos huevos tengo en total?", 108, [104, 106, 108, 110]),
+    ("Un mes tiene 30 días. ¿Cuántos días hay en 6 meses?", 180, [175, 178, 180, 183])
+]
 
     preguntas_dificiles = [
-    ("Una fábrica produce 250 coches al día. ¿Cuántos coches producirá en 4 días?", 1000, [900, 950, 1000, 1050]),
-    ("Si una caja contiene 24 latas y compro 7 cajas, ¿cuántas latas tengo en total?", 168, [160, 168, 176, 184]),
-    ("Un avión vuela a 800 km/h. ¿Cuántos kilómetros recorrerá en 5 horas?", 4000, [3800, 4000, 4200, 4400]),
-    ("Si un tren recorre 120 km en 2 horas, ¿cuántos kilómetros recorrerá en 7 horas?", 420, [400, 420, 440, 460]),
-    ("Una empresa tiene 150 empleados y cada uno trabaja 8 horas al día. ¿Cuántas horas de trabajo en total al día?", 1200, [1100, 1150, 1200, 1250]),
-    ("Si una máquina puede producir 500 piezas en una hora, ¿cuántas piezas en un turno de 9 horas?", 4500, [4300, 4400, 4500, 4600]),
+    ("Una fábrica produce 250 coches cada día. ¿Cuántos coches producirá en 4 días?", 1000, [900, 950, 1000, 1050]),
+    ("Cada caja tiene 24 latas. Si compro 7 cajas, ¿cuántas latas tengo en total?", 168, [160, 168, 176, 184]),
+    ("Un avión vuela a 800 km por hora. ¿Cuántos kilómetros recorrerá en 5 horas?", 4000, [3800, 4000, 4200, 4400]),
+    ("Un tren recorre 120 km en 2 horas. ¿Cuántos kilómetros recorrerá en 7 horas?", 420, [400, 420, 440, 460]),
+    ("Una empresa tiene 150 empleados. Cada uno trabaja 8 horas al día. ¿Cuántas horas de trabajo en total al día?", 1200, [1100, 1150, 1200, 1250]),
+    ("Una máquina puede hacer 500 piezas por hora. Si trabaja 9 horas, ¿cuántas piezas hace en total?", 4500, [4300, 4400, 4500, 4600]),
     ("En un estadio caben 50,000 personas. Si se llenan 3 estadios, ¿cuántas personas hay en total?", 150000, [140000, 145000, 150000, 155000]),
-    ("Una biblioteca tiene 20 estantes y cada estante contiene 500 libros. ¿Cuántos libros hay en total?", 10000, [9500, 10000, 10500, 11000]),
-    ("Si un camión puede transportar 2000 kg y necesito mover 10,000 kg, ¿cuántos viajes necesito?", 5, [4, 5, 6, 7]),
+    ("Una biblioteca tiene 20 estantes. Cada estante tiene 500 libros. ¿Cuántos libros hay en total?", 10000, [9500, 10000, 10500, 11000]),
+    ("Un camión puede transportar 2,000 kg. Si necesito mover 10,000 kg, ¿cuántos viajes necesito?", 5, [4, 5, 6, 7]),
     ("Un avión tiene 200 asientos y realiza 4 vuelos al día. ¿Cuántos pasajeros puede transportar en un día?", 800, [750, 800, 850, 900]),
-    ("Si una cosechadora puede cosechar 150 hectáreas en un día, ¿cuántas hectáreas en 6 días?", 900, [850, 900, 950, 1000]),
-    ("Una empresa fabrica 2,500 unidades de un producto por semana. ¿Cuántas unidades en 4 semanas?", 10000, [9500, 10000, 10500, 11000]),
-    ("Si una computadora procesa 1,200 datos por minuto, ¿cuántos datos procesa en 2.5 horas?", 180000, [175000, 180000, 185000, 190000]),
-    ("Un satélite orbita la Tierra 16 veces al día. ¿Cuántas órbitas en una semana?", 112, [108, 110, 112, 114]),
-    ("Si una línea de montaje produce 60 coches por hora, ¿cuántos coches en un turno de 12 horas?", 720, [700, 710, 720, 730]),
-    ("Un tanque tiene capacidad de 15,000 litros. Si se llena con una manguera que suministra 500 litros por minuto, ¿cuánto tarda en llenarse?", 30, [28, 29, 30, 31]),
-    ("Si una población crece en 2,000 personas al año, ¿cuántas personas crecerá en 15 años?", 30000, [28000, 29000, 30000, 31000]),
-    ("Un depósito de agua pierde 250 litros por hora debido a una fuga. ¿Cuántos litros pierde en un día?", 6000, [5800, 5900, 6000, 6100]),
-    ("Si una fábrica trabaja 24 horas al día y produce 100 piezas por hora, ¿cuántas piezas produce en 5 días?", 12000, [11500, 11800, 12000, 12200]),
-    ("Un astronauta viaja a una velocidad de 28,000 km/h. ¿Cuántos kilómetros recorre en 3 horas?", 84000, [82000, 83000, 84000, 85000]),
-    ("Si una bomba de agua puede llenar 3,600 litros en una hora, ¿cuántos litros en 45 minutos?", 2700, [2600, 2650, 2700, 2750]),
-    ("Una planta embotelladora produce 5,000 botellas por hora. ¿Cuántas botellas en un día de 24 horas?", 120000, [115000, 118000, 120000, 122000]),
-    ("Si un corazón late 70 veces por minuto, ¿cuántas veces late en un día?", 100800, [100000, 100800, 101600, 102400]),
+    ("Una cosechadora puede cosechar 150 hectáreas en un día. ¿Cuántas hectáreas puede cosechar en 6 días?", 900, [850, 900, 950, 1000]),
+    ("Una fábrica produce 2,500 unidades cada semana. ¿Cuántas unidades produce en 4 semanas?", 10000, [9500, 10000, 10500, 11000]),
+    ("Una computadora procesa 1,200 datos por minuto. ¿Cuántos datos procesa en 2.5 horas?", 180000, [175000, 180000, 185000, 190000]),
+    ("Un satélite orbita la Tierra 16 veces al día. ¿Cuántas órbitas hace en una semana?", 112, [108, 110, 112, 114]),
+    ("Una línea de montaje produce 60 coches por hora. ¿Cuántos coches produce en un turno de 12 horas?", 720, [700, 710, 720, 730]),
+    ("Un tanque tiene capacidad para 15,000 litros. Si se llena con una manguera que suministra 500 litros por minuto, ¿cuánto tarda en llenarse?", 30, [28, 29, 30, 31]),
+    ("Una población crece en 2,000 personas al año. ¿Cuántas personas crecerá en 15 años?", 30000, [28000, 29000, 30000, 31000]),
+    ("Un depósito pierde 250 litros de agua por hora. ¿Cuántos litros pierde en un día?", 6000, [5800, 5900, 6000, 6100]),
+    ("Una fábrica produce 100 piezas por hora y trabaja 24 horas al día. ¿Cuántas piezas produce en 5 días?", 12000, [11500, 11800, 12000, 12200]),
+    ("Un astronauta viaja a una velocidad de 28,000 km/h. ¿Cuántos kilómetros recorrerá en 3 horas?", 84000, [82000, 83000, 84000, 85000]),
+    ("Una bomba de agua puede llenar 3,600 litros en una hora. ¿Cuántos litros llenará en 45 minutos?", 2700, [2600, 2650, 2700, 2750]),
+    ("Una planta embotelladora produce 5,000 botellas por hora. ¿Cuántas botellas produce en un día de 24 horas?", 120000, [115000, 118000, 120000, 122000]),
+    ("Un corazón late 70 veces por minuto. ¿Cuántas veces late en un día?", 100800, [100000, 100800, 101600, 102400]),
     ("Un generador produce 1.5 megavatios por hora. ¿Cuántos megavatios produce en un mes de 30 días?", 1080, [1000, 1040, 1080, 1120]),
-    ("Si un avión recorre 900 km en 1.5 horas, ¿cuánto recorrerá en 8 horas?", 4800, [4600, 4700, 4800, 4900]),
-    ("Un telescopio espacial toma 12 imágenes por hora. ¿Cuántas imágenes en una semana?", 2016, [2000, 2016, 2032, 2048]),
-    ("Si una empresa tiene ingresos de $250,000 al mes, ¿cuáles son sus ingresos en un año?", 3000000, [2900000, 2950000, 3000000, 3050000]),
+    ("Un avión recorre 900 km en 1.5 horas. ¿Cuántos kilómetros recorrerá en 8 horas?", 4800, [4600, 4700, 4800, 4900]),
+    ("Un telescopio toma 12 imágenes por hora. ¿Cuántas imágenes toma en una semana?", 2016, [2000, 2016, 2032, 2048]),
+    ("Una empresa tiene ingresos de $250,000 al mes. ¿Cuáles son sus ingresos en un año?", 3000000, [2900000, 2950000, 3000000, 3050000]),
     ("Un atleta entrena 4 horas al día, quemando 600 calorías por hora. ¿Cuántas calorías quema en 5 días?", 12000, [11500, 11800, 12000, 12200]),
-    ("Si la Tierra tarda 365 días en orbitar el Sol, ¿cuántos días en 12 órbitas?", 4380, [4320, 4350, 4380, 4410]),
+    ("La Tierra tarda 365 días en orbitar el Sol. ¿Cuántos días tarda en dar 12 órbitas?", 4380, [4320, 4350, 4380, 4410]),
     ("Un río fluye a 2,000 litros por segundo. ¿Cuántos litros fluyen en una hora?", 7200000, [7100000, 7150000, 7200000, 7250000]),
-    ("Si un bibliotecario puede catalogar 30 libros por hora, ¿cuántos libros en una semana laboral de 40 horas?", 1200, [1150, 1180, 1200, 1220]),
-    ]
+    ("Un bibliotecario cataloga 30 libros por hora. ¿Cuántos libros cataloga en una semana de 40 horas?", 1200, [1150, 1180, 1200, 1220])
+]
+
 
 
     # Aumentar la dificultad según la vida del enemigo
@@ -783,10 +795,13 @@ def mostrar_texto_multilinea(texto, fuente, color, rect, screen):
 import cv2  # Importar OpenCV para reproducir videos
 
 # Función para reproducir video
-def reproducir_video(screen, video_path,sonido_ganalvl3):
-    
+def reproducir_video(screen, video_path, sonido_path=None):
     cap = cv2.VideoCapture(video_path)
     clock = pygame.time.Clock()
+
+    if sonido_path:
+        pygame.mixer.music.load(sonido_path)
+        pygame.mixer.music.play()
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -801,9 +816,15 @@ def reproducir_video(screen, video_path,sonido_ganalvl3):
         clock.tick(30)
 
     cap.release()
+    if sonido_path:
+        pygame.mixer.music.stop()
 
 # Función de nivel 3 - Batalla Matemática
 def nivel_3(screen, volver_al_mapa):
+    video_pathIntroLvl3 = obtener_ruta_recurso('videos/IntroLvl3.mp4')
+    pygame.mixer.music.load(obtener_ruta_recurso('sonidos/Lvl3_instruccion.wav'))
+    pygame.mixer.music.play()
+    reproducir_video(screen, video_pathIntroLvl3)
     global VIDA_JUGADOR, VIDA_ENEMIGO  # Utilizar las variables globales
     VIDA_JUGADOR = 100
     VIDA_ENEMIGO = 100
@@ -911,11 +932,11 @@ def nivel_3(screen, volver_al_mapa):
         ronda_actual += 1  # Incrementar la ronda
 
     # Final de la batalla
-    video_path2 = obtener_ruta_recurso('videos/GANA_LVL3.mp4') if VIDA_ENEMIGO <= 0 else obtener_ruta_recurso('videos/RAFITOCORREA_ELMEJOR.mp4')
-    pygame.mixer.music.load(obtener_ruta_recurso('sonidos/Felicidadeslvl3.wav') if VIDA_ENEMIGO <= 0 else obtener_ruta_recurso('sonidos/PERDISTE.mp3'))
-
-    reproducir_video(screen, video_path2, )
+    video_path2 = obtener_ruta_recurso('videos/GANA_LVL3.mp4') if VIDA_ENEMIGO <= 0 else obtener_ruta_recurso('videos/perdiste_video_lvl3.mp4')
+    pygame.mixer.music.load(obtener_ruta_recurso('sonidos/Felicidadeslvl3.wav') if VIDA_ENEMIGO <= 0 else obtener_ruta_recurso('sonidos/Perdistelvl3.wav'))
     pygame.mixer.music.play()
+    reproducir_video(screen, video_path2)
+    
 
     if VIDA_ENEMIGO <= 0:
         sonido_victoria.play()  # Reproducir sonido de victoria
