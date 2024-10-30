@@ -4,11 +4,11 @@ import pygame
 import sys
 from compartido import font_medium, small_font, font_mediana
 
-
 # Configuración de pantalla
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 480
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
 # Función para obtener la ruta completa de un recurso (si no está en compartido.py)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -27,45 +27,38 @@ def mostrar_acerca_de(screen):
     fondo_interaccion = pygame.image.load(obtener_ruta_recurso('imagenes/Acercade.png'))
     fondo_interaccion = pygame.transform.scale(fondo_interaccion, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
+    # Dibujar la imagen de fondo
+    screen.blit(fondo_interaccion, (0, 0))
 
     # Texto que se mostrará
-    titulo = "Acerca de Corebot"
+    titulo = "Core Math"
     descripcion = [
         "",
-        "¡Bienvenido a Corebot!",
-"Corebot es un robot educativo amigable y divertido,",
-"creado para el apoyo en la enseñanza de matemáticas.",
-"Para las y los niños pequeños.",
-"Responde preguntas y brinda apoyo didáctico,",
-"con ejemplos prácticos y cotidianos",
-"que hacen que las matemáticas sean más fáciles de entender.",
-"Autor: Holger Centeno.",
-"Bajo la dirección del Ing. Orlando Erazo, PhD.",
-"Hecho con Python y Pygame."
+        "¡Bienvenido!",
+        "Coremath es un robot educativo amigable y divertido,",
+        "creado para el apoyo en la enseñanza de matemáticas.",
+        "Para las y los niños pequeños.",
+        "Responde preguntas y brinda apoyo didáctico,",
+        "con ejemplos prácticos y cotidianos",
+        "que hacen que las matemáticas sean más fáciles de entender.",
+        "Autor: Holger Centeno.",
+        "Bajo la dirección del Ing. Orlando Erazo, PhD.",
+        "Hecho con Python y Pygame."
     ]
-
-    # Fondo con un color degradado mejorado
-    for y in range(screen.get_height()):
-        color_gradiente = (
-            int(255 - (y / screen.get_height()) * 100),  # Más sutil en el degradado
-            int(255 - (y / screen.get_height()) * 100),
-            255
-        )
-        pygame.draw.line(screen, color_gradiente, (0, y), (screen.get_width(), y))
 
     # Renderizar título con sombra
     shadow_offset = 2
-    titulo_surf_shadow = font_medium.render(titulo, True, GREY)
+    titulo_surf_shadow = font_mediana.render(titulo, True, GREY)
     titulo_rect_shadow = titulo_surf_shadow.get_rect(center=(screen.get_width() // 2 + shadow_offset, 100 + shadow_offset))
     screen.blit(titulo_surf_shadow, titulo_rect_shadow)
 
-    titulo_surf = font_medium.render(titulo, True, BLUE)
+    titulo_surf = font_mediana.render(titulo, True, BLUE)
     titulo_rect = titulo_surf.get_rect(center=(screen.get_width() // 2, 100))
     screen.blit(titulo_surf, titulo_rect)
 
     # Renderizar descripción con mayor margen en la parte inferior
-    y_offset = 150  # Donde empieza el texto de descripción
-    line_spacing = 28  # Ajustar espacio entre líneas
+    y_offset = 120  # Donde empieza el texto de descripción
+    line_spacing = 24  # Ajustar espacio entre líneas
     for linea in descripcion:
         linea_surf = small_font.render(linea, True, BLACK)
         linea_rect = linea_surf.get_rect(center=(screen.get_width() // 2, y_offset))
@@ -73,9 +66,9 @@ def mostrar_acerca_de(screen):
         y_offset += line_spacing  # Ajustar espacio entre líneas
 
     # Botón de "Regresar" con bordes redondeados y mejor posicionado
-    boton_rect = pygame.Rect(screen.get_width() // 2 - 100, screen.get_height() - 80, 200, 50)  # Posición ajustada
-    pygame.draw.rect(screen, BLUE, boton_rect, border_radius=12)  # Bordes redondeados
-    boton_texto = small_font.render("Regresar", True, WHITE)
+    boton_rect = pygame.Rect(10,10, 100, 50)  # Posición ajustada
+    pygame.draw.rect(screen, BLACK, boton_rect, border_radius=12)  # Bordes redondeados
+    boton_texto = small_font.render("Volver", True, WHITE)
     boton_texto_rect = boton_texto.get_rect(center=boton_rect.center)
     screen.blit(boton_texto, boton_texto_rect)
 
@@ -97,7 +90,7 @@ def mostrar_acerca_de(screen):
         if boton_rect.collidepoint(mouse_pos):
             pygame.draw.rect(screen, LIGHT_BLUE, boton_rect, border_radius=12)
         else:
-            pygame.draw.rect(screen, BLUE, boton_rect, border_radius=12)
+            pygame.draw.rect(screen, BLACK, boton_rect, border_radius=12)
 
         screen.blit(boton_texto, boton_texto_rect)
         pygame.display.flip()

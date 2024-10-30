@@ -23,7 +23,7 @@ SCREEN_HEIGHT = 480
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
-GREEN = (0, 255, 0)
+GREEN = (0, 128, 0)  # Verde oscuro para que contraste mejor con el fondo
 GRAYDARK = (169, 169, 169)
 
 # Cargar imagen de fondo
@@ -41,6 +41,7 @@ fondo_preguntalvl3 = pygame.transform.scale(fondo_preguntalvl3, (SCREEN_WIDTH, S
 
 # Cargar sonidos
 sonido_click = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/button_09-190435.mp3'))  # Sonido de clic en botones
+sonido_BIEN = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/correct-6033.mp3'))  # Sonido de victoria
 
 
 # Función para desbloquear el siguiente nivel (importada desde menu_niveles.py)
@@ -239,8 +240,8 @@ def nivel(screen, volver_al_mapa, tabla_seleccionada):
                     mostrar_texto_centrado(str(respuestas[3]), small_font_tabla, BLACK, rect_respuesta_4, screen)
                     
                     # Volver a mostrar los puntos y las vidas totales
-                    mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(600, 50, 190, 40), screen)
-                    mostrar_texto_centrado(f'Vidas: {vidas}', font_principal, BLACK, pygame.Rect(10, 80, 190, 40), screen)
+                    mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 10, 190, 40), screen)
+                    mostrar_texto_centrado(f'Vidas: {vidas}', font_principal, BLACK, pygame.Rect(10, 10, 190, 40), screen)
 
                     # Volver a dibujar botones
                     dibujar_botones(screen)
@@ -257,6 +258,7 @@ def nivel(screen, volver_al_mapa, tabla_seleccionada):
 
                     # Botón de entrada de voz
                     if SCREEN_WIDTH // 2 - 80 <= mouse_pos[0] <= SCREEN_WIDTH // 2 + 80 and SCREEN_HEIGHT - 80 <= mouse_pos[1] <= SCREEN_HEIGHT - 30:
+                        sonido_click.play()  # Reproducir sonido de clic
                         respuesta_voz = entrada_de_voz()
                         if respuesta_voz.isdigit():
                             respuesta_seleccionada = int(respuesta_voz)
@@ -272,6 +274,7 @@ def nivel(screen, volver_al_mapa, tabla_seleccionada):
                             aciertos += 1  # Sumar un acierto
                             puntos += 2    # Sumar 2 puntos por acierto
                             mostrar_mensaje_con_fondo(screen, '¡Correcto!', font_mediana, WHITE, GREEN, pygame.Rect(260, 355, 300, 35))
+                            sonido_BIEN.play()  # Reproducir sonido de acierto
                             pygame.display.update()
 
                             # Esperar 1 segundo y pasar a la siguiente pregunta automáticamente
@@ -324,8 +327,11 @@ def nivel(screen, volver_al_mapa, tabla_seleccionada):
         preguntas_restantes -= 1
 
     # Mostrar el puntaje final y mensaje de victoria
-    video_path = obtener_ruta_recurso('videos/videozzz.mp4')
-    reproducir_video(screen, video_path)
+    video_pathGANALvl1 = obtener_ruta_recurso('videos/GANA_LVL1.mp4')
+    pygame.mixer.music.load(obtener_ruta_recurso('sonidos/ganaste_mid_lvl1.wav'))
+    pygame.mixer.music.play()
+    reproducir_video(screen, video_pathGANALvl1)
+    screen.fill(WHITE)
     mostrar_texto_centrado('¡Felicidades! Has ganado', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 100, 300, 50), screen)
     mostrar_texto_centrado(f'Aciertos: {aciertos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50, 300, 50), screen)
     mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2, 300, 50), screen)
@@ -430,8 +436,8 @@ def nivel_2(screen, volver_al_mapa):
     mensaje_mostrado = False  # Para manejar el tiempo de visualización de mensajes
 
     # Colores para los mensajes
-    COLOR_CORRECTO = (0, 255, 0)
-    COLOR_INCORRECTO = (255, 0, 0)
+    COLOR_CORRECTO = (0, 128, 0)  # Verde oscuro
+    COLOR_INCORRECTO = (255, 69, 0)  # Rojo anaranjado
 
     while preguntas_restantes > 0 and vidas > 0:
         # Generar una pregunta aleatoria del segundo nivel
@@ -451,7 +457,7 @@ def nivel_2(screen, volver_al_mapa):
         mostrar_texto_centrado(pregunta, font_principal, BLACK, rect_pregunta, screen)
         for idx, rect in enumerate(rect_respuestas):
             mostrar_texto_centrado(str(respuestas[idx]), small_font_tabla, BLACK, rect, screen)
-        mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH - 180, 30, 190, 40), screen)
+        mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 40, 190, 40), screen)
         mostrar_texto_centrado(f'Vidas: {vidas}', font_principal, BLACK, pygame.Rect(2, 40, 190, 40), screen)
         dibujar_botones(screen)
         pygame.display.update()  # Actualizar la pantalla inicial
@@ -514,8 +520,11 @@ def nivel_2(screen, volver_al_mapa):
                             mostrar_correcto = True  # Bandera para mostrar "¡Correcto!"
                             tiempo_inicio_mensaje = pygame.time.get_ticks()
                             # Mostrar mensaje "¡Correcto!" en color verde y centrarlo
-                            mostrar_mensaje_con_fondo(screen, '¡Correcto!', font_mediana, WHITE, COLOR_CORRECTO, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 150, 300, 50))
+                            mostrar_mensaje_con_fondo(screen, '¡Correcto!', font_mediana, WHITE, COLOR_CORRECTO, pygame.Rect(260, 355, 300, 35))
+                            sonido_BIEN.play()  # Reproducir sonido de acierto
+
                             pygame.display.update()
+                            pygame.time.wait(3000)  # Esperar 1 segundo para mostrar el mensaje
                             resultado_mostrado = True  # Salir del bucle para la siguiente pregunta
                         else:
                             vidas -= 1
@@ -523,8 +532,9 @@ def nivel_2(screen, volver_al_mapa):
                             mostrar_correcto = False  # Bandera para no mostrar "¡Correcto!"
                             tiempo_inicio_mensaje = pygame.time.get_ticks()
                             # Mostrar mensaje "¡Incorrecto!" en color rojo
-                            mostrar_mensaje_con_fondo(screen, '¡Incorrecto! Inténtalo de nuevo.', smaller_font, WHITE, COLOR_INCORRECTO, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 150, 300, 50))
+                            mostrar_mensaje_con_fondo(screen, '¡Incorrecto! Inténtalo de nuevo.', smaller_font, WHITE, COLOR_INCORRECTO, pygame.Rect(260, 355, 300, 35))
                             pygame.display.update()
+                            pygame.time.wait(3000)  # Esperar 1 segundo para mostrar el mensaje
                             respuesta_seleccionada = None  # Permitir reintento
                             ha_respondido = False
 
@@ -536,17 +546,21 @@ def nivel_2(screen, volver_al_mapa):
                     tiempo_inicio_mensaje = None
                     # Limpiar mensaje y mostrar pregunta nuevamente
                     screen.blit(fondo_preguntalvl2, (0, 0))
-                    mostrar_texto_centrado(pregunta, font_mediana, BLACK, rect_pregunta, screen)
+                    mostrar_texto_centrado(pregunta, font_principal, BLACK, rect_pregunta, screen)
                     for idx, rect in enumerate(rect_respuestas):
                         mostrar_texto_centrado(str(respuestas[idx]), small_font_tabla, BLACK, rect, screen)
-                    mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 10, 190, 40), screen)
-                    mostrar_texto_centrado(f'Vidas: {vidas}', font_principal, BLACK, pygame.Rect(10, 10, 190, 40), screen)
+                    mostrar_texto_centrado(f'Puntos: {puntos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH - 200, 40, 190, 40), screen)
+                    mostrar_texto_centrado(f'Vidas: {vidas}', font_principal, BLACK, pygame.Rect(2, 40, 190, 40), screen)
                     dibujar_botones(screen)
                     pygame.display.update()  # Refrescar la pantalla con la nueva pregunta y opciones
 
         preguntas_restantes -= 1
 
     # Mostrar el puntaje final y mensaje de victoria
+    video_pathGANA_LVL2 = obtener_ruta_recurso('videos/GANA_LVL2.mp4')
+    pygame.mixer.music.load(obtener_ruta_recurso('sonidos/ganaste_mid_lvl2.wav'))
+    pygame.mixer.music.play()
+    reproducir_video(screen, video_pathGANA_LVL2)
     screen.fill(WHITE)
     mostrar_texto_centrado('¡Felicidades! Has ganado', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 100, 300, 50), screen)
     mostrar_texto_centrado(f'Aciertos: {aciertos}', font_principal, BLACK, pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50, 300, 50), screen)
@@ -598,7 +612,7 @@ imagen_bala = pygame.image.load(obtener_ruta_recurso('imagenes/bala.png')) # Ima
 imagen_bala = pygame.transform.scale(imagen_bala, (100, 30)) # Redimensionar para proyectil
 
 # Cargar sonidos
-sonido_correcto = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/correctoarco.mp3'))
+sonido_correcto = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/ough-47202.mp3'))
 sonido_incorrecto = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/enemigo_te_pega.mp3'))
 sonido_victoria = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/GANASTE_MED.mp3'))
 sonido_derrota = pygame.mixer.Sound(obtener_ruta_recurso('sonidos/PERDISTE.mp3'))
@@ -685,30 +699,30 @@ def generar_pregunta_razonamiento_multiplicacion():
     ("Un tren recorre 120 km en 2 horas. ¿Cuántos kilómetros recorrerá en 7 horas?", 420, [400, 420, 440, 460]),
     ("Una empresa tiene 150 empleados. Cada uno trabaja 8 horas al día. ¿Cuántas horas de trabajo en total al día?", 1200, [1100, 1150, 1200, 1250]),
     ("Una máquina puede hacer 500 piezas por hora. Si trabaja 9 horas, ¿cuántas piezas hace en total?", 4500, [4300, 4400, 4500, 4600]),
-    ("En un estadio caben 50,000 personas. Si se llenan 3 estadios, ¿cuántas personas hay en total?", 150000, [140000, 145000, 150000, 155000]),
+    ("En un estadio caben 500 personas. Si se llenan 3 estadios, ¿cuántas personas hay en total?", 1500, [1400, 1450, 1500, 1550]),
     ("Una biblioteca tiene 20 estantes. Cada estante tiene 500 libros. ¿Cuántos libros hay en total?", 10000, [9500, 10000, 10500, 11000]),
     ("Un camión puede transportar 2,000 kg. Si necesito mover 10,000 kg, ¿cuántos viajes necesito?", 5, [4, 5, 6, 7]),
     ("Un avión tiene 200 asientos y realiza 4 vuelos al día. ¿Cuántos pasajeros puede transportar en un día?", 800, [750, 800, 850, 900]),
     ("Una cosechadora puede cosechar 150 hectáreas en un día. ¿Cuántas hectáreas puede cosechar en 6 días?", 900, [850, 900, 950, 1000]),
-    ("Una fábrica produce 2,500 unidades cada semana. ¿Cuántas unidades produce en 4 semanas?", 10000, [9500, 10000, 10500, 11000]),
-    ("Una computadora procesa 1,200 datos por minuto. ¿Cuántos datos procesa en 2.5 horas?", 180000, [175000, 180000, 185000, 190000]),
+    ("Una fábrica produce 250 unidades cada semana. ¿Cuántas unidades produce en 4 semanas?", 1000, [950, 1000, 1050, 1100]),
+    ("Una computadora procesa 1200 datos por minuto. ¿Cuántos datos procesa en 1 hora?", 72000, [74000, 72000, 56000, 62000]),
     ("Un satélite orbita la Tierra 16 veces al día. ¿Cuántas órbitas hace en una semana?", 112, [108, 110, 112, 114]),
     ("Una línea de montaje produce 60 coches por hora. ¿Cuántos coches produce en un turno de 12 horas?", 720, [700, 710, 720, 730]),
     ("Un tanque tiene capacidad para 15,000 litros. Si se llena con una manguera que suministra 500 litros por minuto, ¿cuánto tarda en llenarse?", 30, [28, 29, 30, 31]),
-    ("Una población crece en 2,000 personas al año. ¿Cuántas personas crecerá en 15 años?", 30000, [28000, 29000, 30000, 31000]),
+    ("Una población crece en 200 personas al año. ¿Cuántas personas crecerá en 15 años?", 3000, [2800, 2900, 3000, 3100]),
     ("Un depósito pierde 250 litros de agua por hora. ¿Cuántos litros pierde en un día?", 6000, [5800, 5900, 6000, 6100]),
     ("Una fábrica produce 100 piezas por hora y trabaja 24 horas al día. ¿Cuántas piezas produce en 5 días?", 12000, [11500, 11800, 12000, 12200]),
-    ("Un astronauta viaja a una velocidad de 28,000 km/h. ¿Cuántos kilómetros recorrerá en 3 horas?", 84000, [82000, 83000, 84000, 85000]),
+    ("Un astronauta viaja a una velocidad de 280 km/h. ¿Cuántos kilómetros recorrerá en 3 horas?", 840, [820, 830, 840, 850]),
     ("Una bomba de agua puede llenar 3,600 litros en una hora. ¿Cuántos litros llenará en 45 minutos?", 2700, [2600, 2650, 2700, 2750]),
     ("Una planta embotelladora produce 5,000 botellas por hora. ¿Cuántas botellas produce en un día de 24 horas?", 120000, [115000, 118000, 120000, 122000]),
-    ("Un corazón late 70 veces por minuto. ¿Cuántas veces late en un día?", 100800, [100000, 100800, 101600, 102400]),
+    ("Un corazón late 70 veces por minuto. ¿Cuántas veces late en una hora?", 4200, [5200, 4000, 4200, 4020]),
     ("Un generador produce 1.5 megavatios por hora. ¿Cuántos megavatios produce en un mes de 30 días?", 1080, [1000, 1040, 1080, 1120]),
     ("Un avión recorre 900 km en 1.5 horas. ¿Cuántos kilómetros recorrerá en 8 horas?", 4800, [4600, 4700, 4800, 4900]),
     ("Un telescopio toma 12 imágenes por hora. ¿Cuántas imágenes toma en una semana?", 2016, [2000, 2016, 2032, 2048]),
-    ("Una empresa tiene ingresos de $250,000 al mes. ¿Cuáles son sus ingresos en un año?", 3000000, [2900000, 2950000, 3000000, 3050000]),
+    ("Un empleado tiene ingresos de $2500 al mes. ¿Cuáles son sus ingresos en un año?", 30000, [29000, 29500, 30000, 30500]),
     ("Un atleta entrena 4 horas al día, quemando 600 calorías por hora. ¿Cuántas calorías quema en 5 días?", 12000, [11500, 11800, 12000, 12200]),
     ("La Tierra tarda 365 días en orbitar el Sol. ¿Cuántos días tarda en dar 12 órbitas?", 4380, [4320, 4350, 4380, 4410]),
-    ("Un río fluye a 2,000 litros por segundo. ¿Cuántos litros fluyen en una hora?", 7200000, [7100000, 7150000, 7200000, 7250000]),
+    ("Un río fluye a 20 litros por segundo. ¿Cuántos litros fluyen en una hora?", 72000, [71000, 71500, 72000, 72500]),
     ("Un bibliotecario cataloga 30 libros por hora. ¿Cuántos libros cataloga en una semana de 40 horas?", 1200, [1150, 1180, 1200, 1220])
 ]
 
@@ -902,6 +916,7 @@ def nivel_3(screen, volver_al_mapa):
             sonido_correcto.play()  # Reproducir sonido correcto
             mostrar_mensaje_con_fondo(screen, '¡Correcto! Atacaste al enemigo.', small_font, WHITE, GREEN, pygame.Rect(SCREEN_WIDTH // 2 - 200, SCREEN_HEIGHT // 2 + 50, 400, 50))
             # Mostrar mensaje "¡Correcto! Atacaste al enemigo." con shake
+            sonido_BIEN.play()  # Reproducir sonido de acierto
             for _ in range(10):  # Realizar el shake 10 veces
                 offset_x = random.randint(-5, 5)
                 offset_y = random.randint(-5, 5)
